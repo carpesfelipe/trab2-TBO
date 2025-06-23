@@ -1,2 +1,2 @@
 # trab2-TBO
-Implementação de algoritmo de junção
+Implementação de um algoritmo de junção
