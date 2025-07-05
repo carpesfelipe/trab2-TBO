@@ -1,6 +1,8 @@
 all:
-	gcc -Wall -o main *.c
+	gcc -Wall -o trab2 *.c
 run:
-	./main 1 2 1,2,3 4,5,5
+	./trab2 1 2 1,2,3 4,5,5
 val:
-	valgrind ./main 1 2 1,2,3 4,5,5
+	valgrind ./trab2 1 2 1,2,3 4,5,5
+clean:
+	rm -f trab2

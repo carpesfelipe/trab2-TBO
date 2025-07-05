@@ -3,10 +3,14 @@
 #include <stdlib.h>
 
 char ** obtem_campos_juncao(char * linha,int *tamanho){
-    char **campos=calloc(100,sizeof(char*));
+    int qtd=100;
+    char **campos=calloc(qtd,sizeof(char*));
     int i=0;
     char * token=strtok(linha,",");
     while(token!=NULL){
+        if(i>=qtd){
+            campos=realloc(campos,qtd*2);
+        }
         campos[i] = strdup(token);
         token=strtok(NULL,",");
         i++;
@@ -32,7 +36,6 @@ int main(int argc, char *argv[])
     int tam;
     char **L1=obtem_campos_juncao(argv[3],&tam);
     char **L2=obtem_campos_juncao(argv[4],&tam);
-    
     
     destroi_campos_juncao(L1,tam);
     destroi_campos_juncao(L2,tam);
