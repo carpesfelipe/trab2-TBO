@@ -1,4 +1,0 @@
-0,V,RW,K,6
-Y,8A,6,UM,S
-VS,WH,W3,6,0
-ON,ST,8,O,H
