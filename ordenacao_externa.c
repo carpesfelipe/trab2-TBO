@@ -67,11 +67,13 @@ void criando_arquivos(FILE **temp_files, int P){
 
 int preenche_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_file, char **L, int tam) {
 
+    // Abre o arquivo de entrada
     FILE *arquivo1 = fopen(input_file, "r");
     if (arquivo1 == NULL) {
         perror("Erro ao abrir arquivo de entrada");
         return 1;
     }
+
     // Buffer para armazenar as linhas lidas do arquivo de entrada
     char **buffer_linhas = (char **)malloc(M * sizeof(char *));
 
@@ -85,7 +87,7 @@ int preenche_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_f
         return 1;
     }
 
-
+    // Variáveis para leitura de linhas
     char *linha_lida = NULL;
     size_t len = 0; // Tamanho da linha lida
     ssize_t read;  // para armazenar o retorno de get line
@@ -99,6 +101,7 @@ int preenche_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_f
             linha_lida[read - 1] = '\0';
         }
 
+        // Verifica se a linha lida é válida
         buffer_linhas[linhas_no_bloco] = strdup(linha_lida);
         if (buffer_linhas[linhas_no_bloco] == NULL) {
             perror("Erro ao duplicar linha para buffer");
@@ -113,11 +116,10 @@ int preenche_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_f
         }
         linhas_no_bloco++;
 
-        // ve se ja chegou em M linhas
+        // ve se ja chegou em M linhas e se sim, ordena e escreve no arquivo temporário
         if (linhas_no_bloco == M) {
             qsort(buffer_linhas, M, sizeof(char *), compara_linhas);
 
-            // preenche o arquivo temporário atual com as linhas ordenadas
             for (int i = 0; i < M; i++) {
                 fprintf(temp_files[current_temp_file_index], "%s\n", buffer_linhas[i]);
                 free(buffer_linhas[i]);
@@ -131,7 +133,7 @@ int preenche_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_f
         }
     }
 
-    // Se ainda houver linhas no buffer após a leitura do arquivo (nao completou M linhas)
+    // Se ainda houver linhas no buffer após a leitura do arquivo (acontece quando nao completou M linhas)
     if (linhas_no_bloco > 0) {
         qsort(buffer_linhas, linhas_no_bloco, sizeof(char *), compara_linhas);
 
