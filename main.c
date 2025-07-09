@@ -33,6 +33,10 @@ int main(int argc, char *argv[])
     // int P = argv[1];
     // int M= argv[2];
 
+    //recebe p e m
+    int P = atoi(argv[1]);
+    int M = atoi(argv[2]);
+
     int tam;
     char **L1=obtem_campos_juncao(argv[3],&tam);
     char **L2=obtem_campos_juncao(argv[4],&tam);
@@ -40,7 +44,51 @@ int main(int argc, char *argv[])
     destroi_campos_juncao(L1,tam);
     destroi_campos_juncao(L2,tam);
 
-    // PERCORRER OS ARQUIVOS DE ENTRADA E QUEBRAR EM BLOCOS DE TAMANHO M
+    //###########################################################
+    // Abre o arquivo de entrada
+    FILE *input_file = fopen(argv[5], "r");
+    if (input_file == NULL) {
+        perror("Erro ao abrir arquivo de entrada");
+        return 1;
+    }
+
+    //criar 2p arquivos
+    FILE *temp_files[P * 2]; // Array de ponteiros para arquivos temporários
+    for(int i=0;i<P*2;i++){
+        char nome[260];
+        sprintf(nome,"arquivo%d.txt",i);
+        temp_files[i] = fopen(nome, "w");
+        if (temp_files[i] == NULL) {
+            perror("Erro ao criar arquivo temporário");
+            // Fechar arquivos já abertos antes de sair
+            for (int k = 0; k < i; k++) {
+                fclose(temp_files[k]);
+            }
+            fclose(input_file);
+            return 1;
+        }
+    }
+
+    // PERCORRER OS ARQUIVOS DE ENTRADA E QUEBRAR EM BLOCOS DE TAMANHO M 
+    char linha[1024]; // Buffer para ler linhas do arquivo
+
+    int bloco_index = 0; // Índice do bloco atual (conta qtd de linhas lidas)
+    int file_index = P; // Começa a "particionar" nos arquivos temporários a partir do P
+
+    while (fgets(linha, sizeof(linha), input_file) != NULL) {
+        // Verifica se o bloco atual está cheio
+        if (bloco_index >= M) {
+            bloco_index = 0; // Reinicia o índice do bloco
+            file_index++; // Passa para o próximo arquivo temporário
+            if(file_index > (P * 2 - 1)) {
+                file_index = P; // Reinicia para o primeiro arquivo temporário
+            }
+        }
+
+        // Escreve a linha no arquivo temporário atual
+        fprintf(temp_files[file_index], "%s", linha);
+        bloco_index++;
+    }
 
     // OS BLOCOS SERAO ESCRITOS EM 2P ARQUIVOS(NO MAXIMO)
 
