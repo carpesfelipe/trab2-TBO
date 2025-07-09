@@ -1,0 +1,151 @@
+
+
+// int main(int argc, char *argv[])
+// {
+//     // Verifica se o numero de parâmetros é passado corretamente
+//     // if (argc < 8) {
+//     //     return 1;
+//     // }
+//     // int P = argv[1];
+//     // int M= argv[2];
+
+//     //recebe p e m
+//     int P = atoi(argv[1]);
+//     int M = atoi(argv[2]);
+
+//     int tam;
+//     char **L1=obtem_campos_juncao(argv[3],&tam);
+//     char **L2=obtem_campos_juncao(argv[4],&tam);
+    
+//     destroi_campos_juncao(L1,tam);
+//     destroi_campos_juncao(L2,tam);
+
+//     //###########################################################
+//     // Abre o arquivo de entrada
+//     FILE *input_file = fopen(argv[5], "r");
+//     if (input_file == NULL) {
+//         perror("Erro ao abrir arquivo de entrada");
+//         return 1;
+//     }
+
+//     //criar 2p arquivos
+//     FILE *temp_files[P * 2]; // Array de ponteiros para arquivos temporários
+//     for(int i=0;i<P*2;i++){
+//         char nome[260];
+//         sprintf(nome,"%d.txt",i);
+//         temp_files[i] = fopen(nome, "w+"); //w+ para leitura e escrita, cria o arquivo se não existir
+//         if (temp_files[i] == NULL) {
+//             perror("Erro ao criar arquivo temporário");
+//             // Fechar arquivos já abertos antes de sair
+//             for (int k = 0; k < i; k++) {
+//                 fclose(temp_files[k]);
+//             }
+//             fclose(input_file);
+//             return 1;
+//         }
+//     }
+
+//     // PERCORRER OS ARQUIVOS DE ENTRADA E QUEBRAR EM BLOCOS DE TAMANHO M 
+//     // char linha[1024]; // Buffer para ler linhas do arquivo
+
+//     // int bloco_index = 0; // Índice do bloco atual (conta qtd de linhas lidas)
+//     // int file_index = P; // Começa a "particionar" nos arquivos temporários a partir do P
+
+//     // while (fgets(linha, sizeof(linha), input_file) != NULL) {
+//     //     // Verifica se o bloco atual está cheio
+//     //     if (bloco_index >= M) {
+//     //         bloco_index = 0; // Reinicia o índice do bloco
+//     //         file_index++; // Passa para o próximo arquivo temporário
+//     //         if(file_index > (P * 2 - 1)) {
+//     //             file_index = P; // Reinicia para o primeiro arquivo temporário
+//     //         }
+//     //     }
+
+//     //     // Escreve a linha no arquivo temporário atual
+//     //     fprintf(temp_files[file_index], "%s", linha);
+//     //     bloco_index++;
+//     // }
+
+//     // ORDENAR CADA BLOCO de M linhas COM QUICKSORT(OU MERGESORT)
+
+//     // Buffer para as M linhas na memoria
+//     char **buffer_linhas = (char **)malloc(M * sizeof(char *));
+//     if (buffer_linhas == NULL) {
+//         perror("Erro ao alocar memória para buffer_linhas");
+//         fclose(input_file);
+//         for(int i = 0; i < P * 2; i++) {
+//             if (temp_files[i]) fclose(temp_files[i]);
+//         }
+//         destroi_campos_juncao(L1, tam);
+//         destroi_campos_juncao(L2, tam);
+//         return 1;
+//     }
+
+//     char *linha_lida = NULL; 
+//     size_t len = 0;         // Size of getline buffer
+//     ssize_t read;           // Return of getline
+
+//     int linhas_no_bloco = 0; // Counts how many lines are currently in the buffer (up to M)
+//     int current_temp_file_index = P; // Começa a nos arquivos temp a partir de P
+
+//     / FIRST PASS: Read input file, break into M-line blocks, sort, and write to temporary files
+//     while ((read = getline(&linha_lida, &len, input_file)) != -1) {
+//         // Remove the newline at the end, if it exists
+//         if (read > 0 && linha_lida[read - 1] == '\n') {
+//             linha_lida[read - 1] = '\0';
+//         }
+
+//         // Store a copy of the read line in the in-memory buffer
+//         buffer_linhas[linhas_no_bloco] = strdup(linha_lida);
+//         if (buffer_linhas[linhas_no_bloco] == NULL) {
+//             perror("Erro ao duplicar linha para buffer");
+//             // Clean up memory in case of a critical error
+//             free(linha_lida);
+//             for (int i = 0; i < linhas_no_bloco; i++) free(buffer_linhas[i]);
+//             free(buffer_linhas);
+//             fclose(input_file);
+//             for(int i = 0; i < P * 2; i++) {
+//                 if (temp_files[i]) fclose(temp_files[i]);
+//             }
+//             destroi_campos_juncao(L1_fields, tam_L1);
+//             destroi_campos_juncao(L2_fields, tam_L2);
+//             return 1;
+//         }
+//         linhas_no_bloco++;
+
+//         // Check if the current block is full (reached M lines)
+//         if (linhas_no_bloco == M) {
+//             // Sort the M lines in the buffer
+//             qsort(buffer_linhas, M, sizeof(char *), compara_strings);
+
+//             // Write the sorted lines to the current temporary file
+//             for (int i = 0; i < M; i++) {
+//                 fprintf(temp_files[current_temp_file_index], "%s\n", buffer_linhas[i]);
+//                 free(buffer_linhas[i]); // Free the memory of the duplicathas_no_bloco > 0) {
+//         qsort(buffer_linhas, linhas_no_bloco, sizeof(char *), compara_linhas);
+
+//         for (int i = 0; i < linhas_no_bloco; i++) {
+//             fprintf(temp_files[current_temp_file_index], "%s\n", buffer_linhas[i]);
+//             free(buffer_linhas[i]); // Free the memory of the duplicated line after writing
+//         }
+//     }
+
+//     // Free memory and close files
+//     free(linha_lida); 
+//     free(buffer_linhas);
+//     fclose(input_file);
+
+//     for(int i = 0; i < P * 2; i++) {
+//         if (temp_files[i]) fclose(temp_files[i]); // Close all temporary files
+//     }
+
+//     destroi_campos_juncao(L1, tam);
+//     destroi_campos_juncao(L2, tam);
+
+//     // TODO: Implement the merge phase (intercalação balanceada) using the P*2 temporary files.
+//     // This will involve reading from P files and writing to the other P files in alternating passes.
+
+
+//     return 0;
+// }
+
