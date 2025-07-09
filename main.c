@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/types.h>
 
 char ** obtem_campos_juncao(char * linha,int *tamanho){
     int qtd=100;
@@ -24,6 +25,13 @@ void destroi_campos_juncao(char ** l, int tam){
     }
     free(l);
 }
+
+// Comparação de strings para qsort
+int compara_strings(const void *a, const void *b) {
+    return strcmp(*(const char **)a, *(const char **)b);
+}
+
+
 int main(int argc, char *argv[])
 {
     // Verifica se o numero de parâmetros é passado corretamente
@@ -90,9 +98,110 @@ int main(int argc, char *argv[])
         bloco_index++;
     }
 
-    // OS BLOCOS SERAO ESCRITOS EM 2P ARQUIVOS(NO MAXIMO)
+    // ORDENAR CADA BLOCO de M linhas COM QUICKSORT(OU MERGESORT)
+    //ordena em ordem alfabedica cada bloco de M linhas com quicksort
+    
+    // // Buffer para armazenar as M linhas em memória
+    // char **buffer_linhas = (char **)malloc(M * sizeof(char *));
+    // if (buffer_linhas == NULL) {
+    //     perror("Erro ao alocar memória para buffer_linhas");
+    //     fclose(input_file);
+    //     return 1;
+    // }
 
-    // ORDENAR CADA BLOCO COM QUICKSORT(OU MERGESORT)
+    // char *linha_lida = NULL; // Usado por getline
+    // size_t len = 0;         // Tamanho do buffer de getline
+    // ssize_t read;           // Retorno de getline
+
+    // int linhas_no_bloco = 0; // Conta quantas linhas já estão no buffer (até M)
+    // int run_count = 0;       // Conta quantos arquivos de "run" já foram criados
+
+    // // PERCORRER O ARQUIVO DE ENTRADA, QUEBRAR EM BLOCOS DE TAMANHO M,
+    // // ORDENAR CADA BLOCO E ESCREVER EM ARQUIVOS TEMPORÁRIOS
+
+    // while ((read = getline(&linha_lida, &len, input_file)) != -1) {
+    //     // Remove o newline no final, se existir
+    //     if (read > 0 && linha_lida[read - 1] == '\n') {
+    //         linha_lida[read - 1] = '\0';
+    //     }
+
+    //     // Armazena uma cópia da linha lida no buffer da memória
+    //     buffer_linhas[linhas_no_bloco] = strdup(linha_lida);
+    //     if (buffer_linhas[linhas_no_bloco] == NULL) {
+    //         perror("Erro ao duplicar linha para buffer");
+    //         // Limpeza de memória em caso de erro grave
+    //         free(linha_lida);
+    //         for (int i = 0; i < linhas_no_bloco; i++) free(buffer_linhas[i]);
+    //         free(buffer_linhas);
+    //         fclose(input_file);
+    //         return 1;
+    //     }
+    //     linhas_no_bloco++;
+
+    //     // Verifica se o bloco atual está cheio (atingiu M linhas)
+    //     if (linhas_no_bloco == M) {
+    //         // ORDENAR CADA BLOCO DE M LINHAS COM QUICKSORT
+    //         qsort(buffer_linhas, M, sizeof(char *), compara_strings);
+
+    //         if (temp_files[file_index] == NULL) {
+    //             perror("Erro ao criar arquivo de run temporário");
+    //             // Limpeza de memória
+    //             free(linha_lida);
+    //             for (int i = 0; i < M; i++) free(buffer_linhas[i]);
+    //             free(buffer_linhas);
+    //             fclose(input_file);
+    //             return 1;
+    //         }
+
+    //         for (int i = 0; i < M; i++) {
+    //             fprintf(temp_files[file_index], "%s\n", buffer_linhas[i]);
+    //             free(buffer_linhas[i]); // Libera a memória da linha duplicada após escrever
+    //         }
+    //         fclose(temp_files[file_index]); // Fecha o arquivo do run
+
+    //         linhas_no_bloco = 0; // Reinicia o contador para o próximo bloco
+    //         run_count++;        // Incrementa o número de runs criados
+
+    //         file_index++;
+    //         if(file_index > ((2*P)-1)){
+    //             printf("vou voltar a preencher em P\n");
+    //             file_index = P; //volta a preencher a partir de P
+    //         }
+    //     }
+    // }
+
+    // // Lida com o último bloco de linhas, que pode ter menos de M linhas
+    // if (linhas_no_bloco > 0) {
+    //     qsort(buffer_linhas, linhas_no_bloco, sizeof(char *), compara_strings);
+
+    //     // char nome_run[260];
+    //     // sprintf(nome_run, "run_%d.txt", run_count);
+    //     for (int i = 0; i < M; i++) {
+    //             fprintf(temp_files[file_index], "%s\n", buffer_linhas[i]);
+    //             free(buffer_linhas[i]); // Libera a memória da linha duplicada após escrever
+    //     }
+    //     // FILE *output_run_file = fopen(nome_run, "w");
+    //     // if (output_run_file == NULL) {
+    //     //     perror("Erro ao criar arquivo de run temporário (último bloco)");
+    //     //     // Limpeza de memória
+    //     //     free(linha_lida);
+    //     //     for (int i = 0; i < linhas_no_bloco; i++) free(buffer_linhas[i]);
+    //     //     free(buffer_linhas);
+    //     //     fclose(input_file);
+    //     //     return 1;
+    //     // }
+
+    //     // for (int i = 0; i < linhas_no_bloco; i++) {
+    //     //     fprintf(output_run_file, "%s\n", buffer_linhas[i]);
+    //     //     free(buffer_linhas[i]); // Libera a memória da linha
+    //     // }
+    //     fclose(temp_files[file_index]);
+    // }
+
+    // // Libera a memória e fecha o arquivo de entrada
+    // free(linha_lida); // Liberado pela getline, se read == -1 na última chamada
+    // free(buffer_linhas);
+    // fclose(input_file);
 
     // IMPRESSAO DO ARQUIVO 3
 
