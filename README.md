@@ -4,8 +4,13 @@ Implementação de um algoritmo de junção
 # duvidas
 
 vai ter sempre o mesmo tamanho em L1 e L2?
-ordenacao é crescente/alfabetica?
 criar muitos arquivos é um problema? 
+linhas sempre erao o mesmo numero de campos?
+
+criar/salvar as linhas em char **
+ordenar com qsort
+criar char ** pra salvar cada linha
+merge sort com vetor pra ir salvando o menor (busca menor normal, n vai ser muito custoso pq nunca terao muitos P's)
 
 # rodar
 

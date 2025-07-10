@@ -14,9 +14,9 @@ int main(int argc, char *argv[]){
     int P = atoi(argv[1]);
     int M = atoi(argv[2]);
 
-    int tam; 
-    char **L1 = obtem_campos_juncao(argv[3], &tam);
-    char **L2 = obtem_campos_juncao(argv[4], &tam);
+    int tam;
+    char **L1 = linhas_para_campos(argv[3], &tam);
+    char **L2 = linhas_para_campos(argv[4], &tam);
 
     //cria os 2P arquivos
     FILE *temp_files[P * 2]; 
@@ -27,6 +27,11 @@ int main(int argc, char *argv[]){
     int x = preenche_arquivos_temporarios(temp_files, P, M, argv[5], L1, tam);
     if(x != 0) {
         return x; 
+    }
+
+    //fecha temp_files
+    for (int i = 0; i < P * 2; i++) {
+        fclose(temp_files[i]);
     }
 
     destroi_campos_juncao(L1, tam);
