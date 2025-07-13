@@ -5,18 +5,17 @@ int compara_linhas(const void *linha1, const void *linha2)
     Linha *l1 = (Linha *)linha1;
     Linha *l2 = (Linha *)linha2;
     int index;
+
+
     for (int i = 0; i < (*(l1)).qtd_campos_juncao; i++)
     {
         index = atoi((*(l1)).campos_juncao[i]);
         int ehDiferenteString = strcmp((*(l1)).colunas[index], (*(l2)).colunas[index]);
-        if (!ehDiferenteString)
-        {
-            continue;
-        }
-        else
+        if (ehDiferenteString || (!ehDiferenteString && i==(*(l1)).qtd_campos_juncao-1) )
         {
             return ehDiferenteString;
         }
+    
     }
     return -1;
 }

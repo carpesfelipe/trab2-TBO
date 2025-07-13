@@ -26,11 +26,14 @@ int main(int argc, char *argv[]){
     // preenche os arquivos temporários com as m linhas ordenadas
     // para aquivo 1
     preenche_arquivos_temporarios(temp_files, P, M, argv[5], L1, tam);
+    
     // if(x != 0) {
     //     return x; 
     // }
 
-    ordenar_blocos(temp_files, P, M, argv[5]);
+    //ordenar_blocos(temp_files, P, M, argv[5]);
+
+
 
     destroi_campos_juncao(L1, tam);
     destroi_campos_juncao(L2, tam);
