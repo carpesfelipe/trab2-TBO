@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include "ordenacao_externa.h"
+#include "merge.h"
 
 int main(int argc, char *argv[]){
     // Verifica se o numero de parâmetros é passado corretamente
@@ -28,6 +29,8 @@ int main(int argc, char *argv[]){
     // if(x != 0) {
     //     return x; 
     // }
+
+    ordenar_blocos(temp_files, P, M, argv[5]);
 
     destroi_campos_juncao(L1, tam);
     destroi_campos_juncao(L2, tam);

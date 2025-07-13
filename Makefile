@@ -1,5 +1,5 @@
 all:
-	gcc -Wall -o trab2 *.c
+	gcc -Wall -o trab2 *.c -lm
 run:
 	./trab2 2 4 1,0 0,2 examples/1/file1.txt
 val:
