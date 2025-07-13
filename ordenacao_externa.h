@@ -14,4 +14,4 @@ int preenche_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_f
 // Funcao para converter um array de strings (L1 ou L2) em um array de inteiros
 // que representam os índices das colunas.
 int *L_para_inteiro(char **L_fields_str, int count);
-#endif s
+#endif 
