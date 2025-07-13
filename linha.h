@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+//macro para fazer cast e pegar o conteudo de um ponteiro para linha
+#define LINHA(ptr) (*((Linha *)(ptr)))
 
 typedef struct linha
 {
