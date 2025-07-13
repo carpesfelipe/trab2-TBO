@@ -1,0 +1,66 @@
+
+
+Função Intercalar_P_Vias_Com_Progresso_De_Runs(ListaDeArquivos, N_Total_Linhas(arq_original), P, tamanho_bloco)
+
+  Conjunto_Dispositivos_Fonte = Dispositivos P a 2P-1  
+  Conjunto_Dispositivos_Destino = Dispositivos 0 a P-1 
+
+  tamanho_run_atual = M_Tamanho_Bloco_Inicial // Começa com o tamanho dos runs iniciais
+
+// tenta ordenar enquanto nao gerar apenas 1 arquivo com o numero total de linhas
+  Enquanto tamanho_run_atual < N_Total_Linhas:
+    Limpar_Arquivos(Conjunto_Dispositivos_Destino)
+
+    indice_arquivo_destino = 0 //começa escrevendo no arquivo "0"
+
+    num_blocos_fontes = (N_Total_Linhas + tamanho_run_atual - 1) / tamanho_run_atual // Ceil division
+
+    //iterando sobre os blocos
+    for(i=0; i<num_blocs_fontes; i++)
+      
+      Lista_ = inicializa (preenche com os (ate) P primeiros elementos)
+      for(j=0; j<P-1; j++)
+        Se (i * P + j) < num_blocos_fontes: // Verifica se ainda há blocos disponiveis
+          // Calcular qual arquivo de fonte e qual run dentro dele
+          // Assumindo que os runs estão sequencialmente em Fontes.
+          // Isso requer um controle mais sofisticado de onde cada run começa e termina
+          // para simular "arquivos lógicos" dentro dos "arquivos físicos"
+          // Para o pseudocódigo, vamos simplificar: suponha que podemos "abrir" um run específico.
+          
+          Abrir stream de leitura para o run (i * P + j) nos Conjunto_Dispositivos_Fonte
+          Adicionar stream à Lista_Streams_Leitura
+        Senão:
+          // Não há P runs completos para este último grupo, adiciona streams vazios ou marca como fim
+          Quebrar Loop Interno // Sai deste loop for j
+
+      Se Lista_Streams_Leitura estiver vazia, Quebrar Loop Externo // Não há mais runs para processar
+
+      Abrir stream de escrita para o Arquivo[indice_arquivo_destino] em Conjunto_Dispositivos_Destino
+      
+      FilaDePrioridade = Nova Min-Heap
+      // Inicializar a FilaDePrioridade com a primeira linha de cada stream de leitura
+      Para cada stream em Lista_Streams_Leitura:
+        Se stream não vazio (ou não atingiu o final do run):
+          Ler linha do stream
+          Inserir (linha, ID_stream_origem) na FilaDePrioridade
+
+      // Lógica principal de intercalação para este grupo de P runs
+      Enquanto FilaDePrioridade não estiver vazia:
+        (linha_atual, ID_stream_origem) = Remover_Menor_Da_FilaDePrioridade()
+        Escrever linha_atual no stream de escrita
+
+        // Ler a próxima linha DO MESMO RUN de onde a linha_atual veio
+        Se stream_origem não vazio E (ainda não atingiu o final do run_atual):
+          Ler proxima linha do stream_origem
+          Inserir (nova_linha, ID_stream_origem) na FilaDePrioridade
+        // Senão: O run de onde essa linha veio está exausto.
+
+      Fechar todos os streams em Lista_Streams_Leitura e o stream de escrita
+      indice_arquivo_destino = indice_arquivo_destino + 1
+
+    // A cada passagem, o papel de fonte e destino é trocado
+    Trocar(Conjunto_Dispositivos_Fonte, Conjunto_Dispositivos_Destino)
+    // O tamanho dos runs duplicou (ou, mais precisamente, multiplicou por P) para a próxima passagem
+    tamanho_run_atual = tamanho_run_atual * P
+
+  Retornar O_Unico_Arquivo_Ordenado_Que_Restou_Nos_Dispositivos_Fonte

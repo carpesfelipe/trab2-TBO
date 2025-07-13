@@ -1,8 +1,8 @@
 all:
 	gcc -Wall -o trab2 *.c
 run:
-	./trab2 1 2 1,2,3 4,5,5
+	./trab2 2 4 1,0 0,2 examples/1/file1.txt
 val:
-	valgrind ./trab2 1 2 1,2,3 4,5,5
+	valgrind --leak-check=full -s ./trab2 2 4 1,0 0,2 examples/1/file1.txt
 clean:
 	rm -f trab2
