@@ -86,6 +86,42 @@ void inicializar_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_roda
     }
 }
 
+// essa funcao deve ler a proxima linha de um file e atualizar a linha correspondente a este file no vetor_proximas_linhas
+void ler_proxima_linha(FILE *arquivo, Linha *linha_atual, char **campos_juncao, int qtd_campos_juncao){
+    //destruindo a linha atual antes de ler a proxima linha (p evitar vazamento de mem)
+    if(linha_atual->colunas != NULL) {
+        destroi_linha(*linha_atual);
+    }
+
+    // inicializa a linha atual
+    *linha_atual = inicia_linha(campos_juncao, qtd_campos_juncao);
+
+    char *linha_lida = NULL; // Buffer para getline (temporario)
+    size_t len = 0; // Tamanho alocado por getline
+
+    //lendo a proxima linha do arquivo
+    ssize_t read = getline(&linha_lida, &len, arquivo);
+
+    if(read != -1){ // se leu a linha com sucasso
+        // Remove o caractere de nova linha '\n' se presente
+        if (read > 0 && linha_lida[read - 1] == '\n') {
+            linha_lida[read - 1] = '\0';
+        }
+        // Adiciona os campos da linha lida
+        add_campos(linha_atual, linha_lida);
+    } else { // Fim do arquivo ou erro na leitura
+        destroi_linha(*linha_atual);
+        linha_atual->colunas = NULL; 
+        linha_atual->qtd_colunas = 0;
+    }
+
+    //liberando o buffer de leitura
+    if (linha_lida != NULL) {
+        free(linha_lida);
+    }
+
+}
+
 void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L, int tam) {
     int tamanho_bloco_ordenado_atual = M; // os primeiros arquivos ordenados começam com tamanho M (mudam a cada iteração)
     int inicio_arquivo_fonte = P; //inicialmente o arquivo medio contem o inicio da primeira ordenação (varia inicialmente de P ate 2P-1)
@@ -159,9 +195,16 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
             //     }
             // }
             
+            //###############################################################################################################################################
+            //################################################## MERGE (modularizar dps) ####################################################################
+            //###############################################################################################################################################
             // //Realizar_Merge_De_P_Vias()
             // Se Contador_Blocos_Ordenados_Abertos == 0:
             //     se nao tiver mais blocos pra ordenar, quebra esse loop (ajeitar)
+
+            //###############################################################################################################################################
+            //################################################### FIM DO MERGE (modularizar dps) ############################################################
+            //###############################################################################################################################################
 
             // libera o vetor de linhas
             for (int k = 0; k < P; k++) {
