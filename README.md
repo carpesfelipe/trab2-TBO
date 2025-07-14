@@ -14,6 +14,5 @@ merge sort com vetor pra ir salvando o menor (busca menor normal, n vai ser muit
 
 # rodar
 
-./trab2 3 3 10,0 7,11 examples/1/file1.txt examples/1/file2.txt examples/1/saida.txt
-./trab2 3 10 1,0 0,2 examples/test/file1.txt examples/test/file2.txt examples/test/saida.txt
-./trab2 3 10 1,0 0,2 examples/test/file1.txt examples/test/file2.txt examples/test/saida.txt
+valgrind ./trab2 3 10 1,0 0,2 examples/1/file1.txt examples/1/file2.txt examples/1/saida.txt
+valgrind ./trab2 3 10 1,0 0,2 examples/test/file1.txt examples/test/file2.txt examples/test/saida.txt

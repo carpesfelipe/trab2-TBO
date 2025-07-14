@@ -31,8 +31,7 @@ int main(int argc, char *argv[]){
     //     return x; 
     // }
 
-    //ordenar_blocos(temp_files, P, M, argv[5]);
-
+    ordenar_blocos(temp_files, P, M, argv[5], L1, tam);
 
 
     destroi_campos_juncao(L1, tam);
