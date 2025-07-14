@@ -43,13 +43,14 @@ int atualiza_indice_arquivo_destino(int *indice_arquivo_destino_atual, int P) {
 //essa funcao deve pegar a primeira linha de cada arquivo temporário de origem e inicializar o vetor de linhas
 void inicializar_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_rodada, int P, Linha *vetor_proximas_linhas, char **campos_juncao, int qtd_campos_juncao) {
     char *linha_lida = NULL; // Buffer para getline
-    size_t len = 0;           // Tamanho alocado por getline
+    size_t len = 0; // Tamanho alocado por getline
 
     for (int i = 0; i < P; i++) {
-        // Obtenha o ponteiro FILE* já aberto em ordenar_blocos
+        // arquivos já foam abertos em ordenar_blocos
         // O vetor arquivos_fontes_abertos_nesta_rodada so diz respeito aos arquivos de leitura abertos nesta rodada (por isso podemos variar o i de 0 ate P sempre sem problemas)
         FILE *current_file = arquivos_fontes_abertos_nesta_rodada[i];
 
+        // Inicializa a linha no vetor de linhas
         vetor_proximas_linhas[i] = inicia_linha(campos_juncao, qtd_campos_juncao);
 
         // Verifica se o arquivo foi aberto com sucesso por `ordenar_blocos` (so p evitar problemas)
@@ -58,9 +59,10 @@ void inicializar_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_roda
             destroi_linha(vetor_proximas_linhas[i]);
             vetor_proximas_linhas[i].colunas = NULL; 
             vetor_proximas_linhas[i].qtd_colunas = 0;
-            continue; // Pula para o próximo arquivo fonte
+            continue; // Pula para o próximo arquivo
         }
         
+        // Lê a primeira linha do arquivo atual
         ssize_t read_bytes = getline(&linha_lida, &len, current_file); 
 
         if (read_bytes != -1) { // Se leu uma linha com sucesso
@@ -85,30 +87,22 @@ void inicializar_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_roda
 }
 
 void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L, int tam) {
-
-    // printf("Iniciando ordenação de blocos...\n");
-
     int tamanho_bloco_ordenado_atual = M; // os primeiros arquivos ordenados começam com tamanho M (mudam a cada iteração)
-    int inicio_arquivo_fonte = P; //inicialmente o arquivo medio contem o inicio da primeira ordenação (varia sempre de P ate 2P-1)
-    int inicio_arquivo_destino = 0; // Inicia as escritas na primeira metade dos arquivos temporários (varia sempre de 0 a P-1)
-    
-    int auxiliar_enquanto_constroi = 0;
+    int inicio_arquivo_fonte = P; //inicialmente o arquivo medio contem o inicio da primeira ordenação (varia inicialmente de P ate 2P-1)
+    int inicio_arquivo_destino = 0; // Inicia as escritas na primeira metade dos arquivos temporários (varia inicialmente de 0 a P-1)
+    char nome[260]; // Buffer para o nome do arquivo temporário
 
-    // //tamanho do arquivo de entrada 
-    // int n_linhas_arquivo = numero_linhas_arquivo(fopen(arquivo_in, "r"));
+    int auxiliar_enquanto_constroi = 0; //vou apagar esse auxiliar depois, é só pra evitar q o loop rode mais do q a qtd que eu quero
 
-    FILE *arquivo_original_entrada = fopen(arquivo_in, "r"); // Abre o arquivo aqui
+    //abrindo o arquivo original de entrada para contar o número de linhas
+    FILE *arquivo_original_entrada = fopen(arquivo_in, "r"); // Abre o arquivo aqui (equivalente ao arquivo 1 ou arquivo 2)
     if (arquivo_original_entrada == NULL) {
         perror("Erro ao abrir arquivo de entrada para contar linhas");
         exit(EXIT_FAILURE);
     }
-
     int n_linhas_arquivo_entrada = numero_linhas_arquivo(arquivo_original_entrada);
     fclose(arquivo_original_entrada); // Fecha o arquivo após usar
-
     // printf("Número total de linhas no arquivo de entrada: %d\n", n_linhas_arquivo_entrada);
-
-    char nome[260];
 
     while (tamanho_bloco_ordenado_atual < n_linhas_arquivo_entrada) // Enquanto todos os dados não estiverem em um único bloco ordenado
     {
@@ -117,7 +111,6 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
         // printf("Limpeza concluída.\n");
 
         int indice_arquivo_destino_atual = inicio_arquivo_destino; // Inicia a distribuição no primeiro arquivo de destino (sera alterado pra cada bloco de merges feitos)
-
         int num_blocos_ord_totais = (n_linhas_arquivo_entrada + tamanho_bloco_ordenado_atual - 1) / tamanho_bloco_ordenado_atual; // arredonda pra cima
         // printf("Número total de blocos ordenados nesta passagem: %d\n", num_blocos_ord_totais);
 
@@ -134,11 +127,10 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
                 int indice_arquivo_real_fonte = inicio_arquivo_fonte + (i * P) + j;
                 
                 sprintf(nome, "%d.txt", indice_arquivo_real_fonte);
-                // Atribua ao array de arquivos fontes desta rodada (usado pra manipular o vetor de proximas linhas)
-                arquivos_fontes_para_esta_rodada[j] = fopen(nome, "r");
-                if (arquivos_fontes_para_esta_rodada[j] == NULL) {
-                    // fprintf(stderr, "Aviso: Nao foi possivel abrir %s. Tratando como fim de bloco de fonte.\n", nome);
-                }
+                arquivos_fontes_para_esta_rodada[j] = fopen(nome, "r"); // abre o arq p leitura e associa ao vetor que vai ser usado pra manipular o vetor de proximas linhas
+                // if (arquivos_fontes_para_esta_rodada[j] == NULL) {
+                //     // fprintf(stderr, "Aviso: Nao foi possivel abrir %s. Tratando como fim de bloco de fonte.\n", nome);
+                // }
             }
 
             // abre o arquivo temporário de destino para escrita
@@ -148,9 +140,6 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
                 perror("Erro ao abrir arquivo de destino para escrita");
                 exit(EXIT_FAILURE);
             }
-
-            // Se Contador_Blocos_Ordenados_Abertos == 0:
-            //     se nao tiver mais blocos pra ordenar, quebra esse loop (ajeitar)
                         
             // Inicializa o vetor de linhas com as primeiras linhas de cada arquivo fonte
             Linha vetor_proximas_linhas[P];
@@ -171,7 +160,10 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
             // }
             
             // //Realizar_Merge_De_P_Vias()
+            // Se Contador_Blocos_Ordenados_Abertos == 0:
+            //     se nao tiver mais blocos pra ordenar, quebra esse loop (ajeitar)
 
+            // libera o vetor de linhas
             for (int k = 0; k < P; k++) {
                 // Só destrua se a linha realmente continha dados alocados (ou seja, colunas não é NULL)
                 if (vetor_proximas_linhas[k].colunas != NULL) {
@@ -179,24 +171,13 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
                 }
             }
             
-            //fechando os arquivos temporários de origem
-            // for (int j = 0; j < P; j++) {
-            //     int indice_arquivo_real_fonte = inicio_arquivo_fonte + (i * P) + j;
-            //     if (temp_files[indice_arquivo_real_fonte] != NULL) {
-            //         fclose(temp_files[indice_arquivo_real_fonte]);
-            //         temp_files[indice_arquivo_real_fonte] = NULL; // Limpar o ponteiro para evitar double-close
-            //     }   
-            // }
-            // // fechando o arquivo temporário de destino
-            // fclose(arquivo_destino);
-
+            //fechando os arquivos 
             for (int j = 0; j < P; j++) {
                 if (arquivos_fontes_para_esta_rodada[j] != NULL) {
                     fclose(arquivos_fontes_para_esta_rodada[j]);
                     arquivos_fontes_para_esta_rodada[j] = NULL;
                 }   
             }
-            // Fechando o arquivo temporário de destino
             if (arquivo_destino_para_esta_rodada != NULL) {
                 fclose(arquivo_destino_para_esta_rodada);
                 arquivo_destino_para_esta_rodada = NULL;
@@ -207,14 +188,13 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
 
         }
 
+        // vou apagar esse auxiliar depois, ele n faz parte da logica
         auxiliar_enquanto_constroi++;
-
         if(auxiliar_enquanto_constroi == 1) {
             break;
         }
 
-        //alterna arquivos fonte e destino
-        trocar_arquivos(&inicio_arquivo_fonte, &inicio_arquivo_destino);
+        trocar_arquivos(&inicio_arquivo_fonte, &inicio_arquivo_destino); //alterna arquivos fonte e destino
         tamanho_bloco_ordenado_atual *= P; // Aumenta o tamanho do bloco ordenado atual para o próximo loop
     }
     
