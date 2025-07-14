@@ -1,8 +1,31 @@
 #include "linha.h"
+#include <ctype.h>
+#include <string.h>
+
+char *trim(char *str) {
+    char *end;
+
+    // Avança até o primeiro caractere não branco
+    while (isspace((unsigned char)*str)) str++;
+
+    if (*str == 0)  // string vazia ou só com espaços
+        return str;
+
+    // Vai para o fim da string
+    end = str + strlen(str) - 1;
+
+    // Anda para trás enquanto houver espaço no final
+    while (end > str && isspace((unsigned char)*end)) end--;
+
+    // Coloca o terminador de string após o último caractere válido
+    *(end + 1) = '\0';
+
+    return str;
+}
 
 int compara_linhas(const void *linha1, const void *linha2)
 {
-   
+
     int index1;
     int index2;
     for (int i = 0; i < LINHA(linha1).qtd_campos_juncao; i++)
@@ -11,13 +34,13 @@ int compara_linhas(const void *linha1, const void *linha2)
         index1 = atoi(LINHA(linha1).campos_juncao[i]);
         index2 = atoi(LINHA(linha2).campos_juncao[i]);
 
-        int ehDiferenteString = strcmp(LINHA(linha1).colunas[index1], LINHA(linha2).colunas[index2]);
-        if (ehDiferenteString || (!ehDiferenteString && (i == LINHA(linha1).qtd_campos_juncao - 1)))
+        int ehDiferenteString = strcmp(trim(LINHA(linha1).colunas[index1]), trim(LINHA(linha2).colunas[index2]));
+        if (ehDiferenteString!=0)
         {
             return ehDiferenteString;
         }
     }
-    return -1;
+    return 0;
 }
 
 void ordena_linhas(Linha *vet_linhas, int qtd_linhas)

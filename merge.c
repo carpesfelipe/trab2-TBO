@@ -41,12 +41,16 @@ int atualiza_indice_arquivo_destino(int *indice_arquivo_destino_atual, int P) {
 }
 
 //essa funcao deve pegar a primeira linha de cada arquivo temporário de origem e inicializar o vetor de linhas
-void inicializar_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_rodada, int P, Linha *vetor_proximas_linhas, char **campos_juncao, int qtd_campos_juncao) {
+void inicializar_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_rodada, int P, Linha *vetor_proximas_linhas, char **campos_juncao, int qtd_campos_juncao, int *linhas_lidas_bloco, int tamanho_atual_bloco) {
     char *linha_lida = NULL; // Buffer para getline
     size_t len = 0; // Tamanho alocado por getline
 
     for (int i = 0; i < P; i++) {
         // arquivos já foam abertos em ordenar_blocos
+
+        //zera o contador de linhas lidas para esse novo bloco
+        linhas_lidas_bloco[i] = 0;
+
         // O vetor arquivos_fontes_abertos_nesta_rodada so diz respeito aos arquivos de leitura abertos nesta rodada (por isso podemos variar o i de 0 ate P sempre sem problemas)
         FILE *current_file = arquivos_fontes_abertos_nesta_rodada[i];
 
@@ -63,15 +67,16 @@ void inicializar_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_roda
         }
         
         // Lê a primeira linha do arquivo atual
-        ssize_t read_bytes = getline(&linha_lida, &len, current_file); 
+        ssize_t read = getline(&linha_lida, &len, current_file); 
 
-        if (read_bytes != -1) { // Se leu uma linha com sucesso
+        if (read != -1) { // Se leu uma linha com sucesso
             // Remove o caractere de nova linha '\n' se presente
-            if (read_bytes > 0 && linha_lida[read_bytes - 1] == '\n') {
-                linha_lida[read_bytes - 1] = '\0';
+            if (read > 0 && linha_lida[read - 1] == '\n') {
+                linha_lida[read - 1] = '\0';
             }
             // Adiciona os campos da linha lida
             add_campos(&(vetor_proximas_linhas[i]), linha_lida);
+            linhas_lidas_bloco[i]++;
         } else { // Fim do arquivo ou erro na leitura
             // fprintf(stderr, "Aviso: Fim do arquivo ou erro ao ler do arquivo fonte [%d]. Tratando como fim de bloco.\n", i);
             destroi_linha(vetor_proximas_linhas[i]);
@@ -87,7 +92,17 @@ void inicializar_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_roda
 }
 
 // essa funcao deve ler a proxima linha de um file e atualizar a linha correspondente a este file no vetor_proximas_linhas
-void ler_proxima_linha(FILE *arquivo, Linha *linha_atual, char **campos_juncao, int qtd_campos_juncao){
+void ler_proxima_linha(FILE *arquivo, Linha *linha_atual, char **campos_juncao, int qtd_campos_juncao, int *linhas_lidas_bloco, int tamanho_atual_bloco){
+    //ver se o bloco ja foi todo lido
+    if(*linhas_lidas_bloco >= tamanho_atual_bloco) {
+        if(linha_atual->colunas != NULL) {
+            destroi_linha(*linha_atual); // Destrói a linha atual para evitar vazamento de memória
+        }
+        linha_atual->colunas = NULL; // Reseta p evitar problemas
+        linha_atual->qtd_colunas = 0; 
+        return; // esse bloco ja foi lido
+    }
+
     //destruindo a linha atual antes de ler a proxima linha (p evitar vazamento de mem)
     if(linha_atual->colunas != NULL) {
         destroi_linha(*linha_atual);
@@ -109,6 +124,7 @@ void ler_proxima_linha(FILE *arquivo, Linha *linha_atual, char **campos_juncao, 
         }
         // Adiciona os campos da linha lida
         add_campos(linha_atual, linha_lida);
+        (*linhas_lidas_bloco)++;
     } else { // Fim do arquivo ou erro na leitura
         destroi_linha(*linha_atual);
         linha_atual->colunas = NULL; 
@@ -122,13 +138,55 @@ void ler_proxima_linha(FILE *arquivo, Linha *linha_atual, char **campos_juncao, 
 
 }
 
+//colocar no linha.c? 
+void imprime_linha_no_destino(Linha linha, FILE *arquivo_destino) {
+    if (linha.colunas != NULL && linha.qtd_colunas > 0) {
+        for (int i = 0; i < linha.qtd_colunas; i++) {
+            fprintf(arquivo_destino, "%s", linha.colunas[i]);
+            if (i < linha.qtd_colunas - 1) {
+                fprintf(arquivo_destino, " "); // Adiciona espaço entre colunas
+            }
+        }
+        fprintf(arquivo_destino, "\n");
+    }
+}
+
+void realizar_merge(Linha *vetor_proximas_linhas, int P, FILE **arquivo_fonte, FILE *arquivo_destino, char **campos_juncao, int qtd_campos_juncao, int tamanho_atual_bloco, int *linhas_lidas_bloco) {
+    // o loop deve acontecer enquando houver linhas valias no vetor
+    while (1) {
+        // Variável para armazenar o índice do menor elemento (o -1 indica que ainda não foi encontrado nenhum elemento)
+        int indice_menor = -1;
+        
+        // Encontra o índice do menor elemento 
+        for (int i = 0; i < P; i++) {
+            if (vetor_proximas_linhas[i].colunas != NULL) {
+                // if (indice_menor == -1 || strcmp(vetor_proximas_linhas[i].colunas[0], vetor_proximas_linhas[indice_menor].colunas[0]) < 0) {
+                if (indice_menor == -1 || compara_linhas(&vetor_proximas_linhas[i], &vetor_proximas_linhas[indice_menor]) < 0) {
+                    indice_menor = i; // Atualiza o índice do menor elemento encontrado até agora
+                }
+            }
+        }
+
+        // Se não encontrar um menor (ou seja, nao tem mais linhas validas), sai do loop
+        if (indice_menor == -1) {
+            break;
+        }
+
+        // Escreve a linha com o menor valor no arquivo de destino
+        imprime_linha_no_destino(vetor_proximas_linhas[indice_menor], arquivo_destino);
+
+        // Lê a próxima linha do arquivo correspondente ao menor elemento
+        ler_proxima_linha(arquivo_fonte[indice_menor], &vetor_proximas_linhas[indice_menor], campos_juncao, qtd_campos_juncao, &linhas_lidas_bloco[indice_menor], tamanho_atual_bloco);
+    }
+}
+
 void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L, int tam) {
     int tamanho_bloco_ordenado_atual = M; // os primeiros arquivos ordenados começam com tamanho M (mudam a cada iteração)
     int inicio_arquivo_fonte = P; //inicialmente o arquivo medio contem o inicio da primeira ordenação (varia inicialmente de P ate 2P-1)
     int inicio_arquivo_destino = 0; // Inicia as escritas na primeira metade dos arquivos temporários (varia inicialmente de 0 a P-1)
     char nome[260]; // Buffer para o nome do arquivo temporário
 
-    int auxiliar_enquanto_constroi = 0; //vou apagar esse auxiliar depois, é só pra evitar q o loop rode mais do q a qtd que eu quero
+    // int auxiliar_enquanto_constroi = 0; //vou apagar esse auxiliar depois, é só pra evitar q o loop rode mais do q a qtd que eu quero
 
     //abrindo o arquivo original de entrada para contar o número de linhas
     FILE *arquivo_original_entrada = fopen(arquivo_in, "r"); // Abre o arquivo aqui (equivalente ao arquivo 1 ou arquivo 2)
@@ -176,10 +234,13 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
                 perror("Erro ao abrir arquivo de destino para escrita");
                 exit(EXIT_FAILURE);
             }
+
+            //usado pra armazenar quantas lidas daquele bloco ja foram lidas (pra ele saber quando parar)
+            int linhas_lidas_do_bloco[P];
                         
             // Inicializa o vetor de linhas com as primeiras linhas de cada arquivo fonte
             Linha vetor_proximas_linhas[P];
-            inicializar_vetor_proximas_linhas(arquivos_fontes_para_esta_rodada, P, vetor_proximas_linhas, L, tam);
+            inicializar_vetor_proximas_linhas(arquivos_fontes_para_esta_rodada, P, vetor_proximas_linhas, L, tam, linhas_lidas_do_bloco, tamanho_bloco_ordenado_atual);
 
             //printando vetor proximas linhas
             // printf("Vetor de próximas linhas inicializado:\n");
@@ -195,16 +256,7 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
             //     }
             // }
             
-            //###############################################################################################################################################
-            //################################################## MERGE (modularizar dps) ####################################################################
-            //###############################################################################################################################################
-            // //Realizar_Merge_De_P_Vias()
-            // Se Contador_Blocos_Ordenados_Abertos == 0:
-            //     se nao tiver mais blocos pra ordenar, quebra esse loop (ajeitar)
-
-            //###############################################################################################################################################
-            //################################################### FIM DO MERGE (modularizar dps) ############################################################
-            //###############################################################################################################################################
+            realizar_merge(vetor_proximas_linhas, P, arquivos_fontes_para_esta_rodada, arquivo_destino_para_esta_rodada, L, tam, tamanho_bloco_ordenado_atual, linhas_lidas_do_bloco);
 
             // libera o vetor de linhas
             for (int k = 0; k < P; k++) {
@@ -232,13 +284,15 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
         }
 
         // vou apagar esse auxiliar depois, ele n faz parte da logica
-        auxiliar_enquanto_constroi++;
-        if(auxiliar_enquanto_constroi == 1) {
-            break;
-        }
+        // auxiliar_enquanto_constroi++;
+        // if(auxiliar_enquanto_constroi == 1) {
+        //     break;
+        // }
 
         trocar_arquivos(&inicio_arquivo_fonte, &inicio_arquivo_destino); //alterna arquivos fonte e destino
         tamanho_bloco_ordenado_atual *= P; // Aumenta o tamanho do bloco ordenado atual para o próximo loop
     }
+
+    //aqui passar o conteudo final pro arquivo que eu quero a saida
     
 }
