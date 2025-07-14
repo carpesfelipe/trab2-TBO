@@ -24,3 +24,4 @@ void add_campos(Linha * linha_ptr, char * string);
 void imprime_linhas_arquivo(Linha * vet_linha,FILE * file, int M);
 
 void destroi_linha(Linha l);
+void imprime_linha(Linha linha);

@@ -61,11 +61,10 @@ Linha inicia_linha(char **campos_juncao, int qtd_campos)
 void add_campos(Linha *linha_ptr, char *string)
 {
     char *token = strtok(string, ",");
-    int i = 0;
     int qtd = 100;
     while (token != NULL)
     {
-        if (i >= qtd)
+        if ((*linha_ptr).qtd_colunas >= qtd)
         {
             qtd *= 2;
             char **tmp = realloc((*(linha_ptr)).colunas, qtd * sizeof(char *));
@@ -74,12 +73,16 @@ void add_campos(Linha *linha_ptr, char *string)
                 perror("Erro ao realocar colunas");
                 exit(1);
             }
+            //inicializa
+            for (int i = qtd/2; i < qtd; i++)
+            {
+                (*(linha_ptr)).colunas[i] = NULL;
+            }
             (*(linha_ptr)).colunas = tmp;
         }
-        (*(linha_ptr)).colunas[i] = strdup(token);
+        (*(linha_ptr)).colunas[(*linha_ptr).qtd_colunas] = strdup(token);
         (*(linha_ptr)).qtd_colunas++;
         token = strtok(NULL, ",");
-        i++;
     }
 }
 
@@ -109,3 +112,13 @@ void destroi_linha(Linha l)
     }
     free(l.colunas);
 }
+
+void imprime_linha(Linha linha){
+    for(int i=0;i<linha.qtd_colunas;i++){
+        if(i==linha.qtd_colunas-1){
+            printf("%s\n",linha.colunas[i]);
+        }else{
+            printf("%s,",linha.colunas[i]);
+        }
+    }
+}   
