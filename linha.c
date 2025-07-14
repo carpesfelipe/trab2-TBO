@@ -1,8 +1,31 @@
 #include "linha.h"
+#include <ctype.h>
+#include <string.h>
+
+char *trim(char *str) {
+    char *end;
+
+    // Avança até o primeiro caractere não branco
+    while (isspace((unsigned char)*str)) str++;
+
+    if (*str == 0)  // string vazia ou só com espaços
+        return str;
+
+    // Vai para o fim da string
+    end = str + strlen(str) - 1;
+
+    // Anda para trás enquanto houver espaço no final
+    while (end > str && isspace((unsigned char)*end)) end--;
+
+    // Coloca o terminador de string após o último caractere válido
+    *(end + 1) = '\0';
+
+    return str;
+}
 
 int compara_linhas(const void *linha1, const void *linha2)
 {
-   
+
     int index1;
     int index2;
     for (int i = 0; i < LINHA(linha1).qtd_campos_juncao; i++)
@@ -11,13 +34,13 @@ int compara_linhas(const void *linha1, const void *linha2)
         index1 = atoi(LINHA(linha1).campos_juncao[i]);
         index2 = atoi(LINHA(linha2).campos_juncao[i]);
 
-        int ehDiferenteString = strcmp(LINHA(linha1).colunas[index1], LINHA(linha2).colunas[index2]);
-        if (ehDiferenteString || (!ehDiferenteString && (i == LINHA(linha1).qtd_campos_juncao - 1)))
+        int ehDiferenteString = strcmp(trim(LINHA(linha1).colunas[index1]), trim(LINHA(linha2).colunas[index2]));
+        if (ehDiferenteString!=0)
         {
             return ehDiferenteString;
         }
     }
-    return -1;
+    return 0;
 }
 
 void ordena_linhas(Linha *vet_linhas, int qtd_linhas)
@@ -38,11 +61,10 @@ Linha inicia_linha(char **campos_juncao, int qtd_campos)
 void add_campos(Linha *linha_ptr, char *string)
 {
     char *token = strtok(string, ",");
-    int i = 0;
     int qtd = 100;
     while (token != NULL)
     {
-        if (i >= qtd)
+        if ((*linha_ptr).qtd_colunas >= qtd)
         {
             qtd *= 2;
             char **tmp = realloc((*(linha_ptr)).colunas, qtd * sizeof(char *));
@@ -51,12 +73,16 @@ void add_campos(Linha *linha_ptr, char *string)
                 perror("Erro ao realocar colunas");
                 exit(1);
             }
+            //inicializa
+            for (int i = qtd/2; i < qtd; i++)
+            {
+                (*(linha_ptr)).colunas[i] = NULL;
+            }
             (*(linha_ptr)).colunas = tmp;
         }
-        (*(linha_ptr)).colunas[i] = strdup(token);
+        (*(linha_ptr)).colunas[(*linha_ptr).qtd_colunas] = strdup(token);
         (*(linha_ptr)).qtd_colunas++;
         token = strtok(NULL, ",");
-        i++;
     }
 }
 
@@ -86,3 +112,13 @@ void destroi_linha(Linha l)
     }
     free(l.colunas);
 }
+
+void imprime_linha(Linha linha){
+    for(int i=0;i<linha.qtd_colunas;i++){
+        if(i==linha.qtd_colunas-1){
+            printf("%s\n",linha.colunas[i]);
+        }else{
+            printf("%s,",linha.colunas[i]);
+        }
+    }
+}   
