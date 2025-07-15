@@ -11,6 +11,7 @@ typedef struct linha
     char **campos_juncao;
     int qtd_campos_juncao;
     int qtd_colunas;
+    int TAM_MAX_COLUNAS;
 }Linha;
 
 int compara_linhas(const void *linha1, const void *linha2);

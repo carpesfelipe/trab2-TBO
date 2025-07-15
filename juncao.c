@@ -23,7 +23,6 @@ void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida,
 
     while ((fim_de_arquivo1 != -1) && (fim_de_arquivo2 != -1))
     {
-
         int cmp = compara_linhas((const void *)&linha1, (const void *)&linha2);
         if ((cmp == 0))
         {
@@ -86,22 +85,24 @@ Linha mescla_linha(Linha l1, Linha l2)
     Linha linha_mesclada;
     linha_mesclada = inicia_linha(l1.campos_juncao, l1.qtd_campos_juncao);
     int index;
-
+    printf("linha mesclada:");
     for (int i = 0; i < l1.qtd_campos_juncao; i++)
     {
         index = atoi(l1.campos_juncao[i]);
         add_campos(&linha_mesclada, l1.colunas[index]);
     }
+   
     for (int i = 0; i < l1.qtd_colunas; i++)
     {
-        if (!eh_campo_juncao(i, l1, l2))
+        if (!eh_campo_juncao(i, l1))
         {
             add_campos(&linha_mesclada, l1.colunas[i]);
         }
     }
+    
     for (int i = 0; i < l2.qtd_colunas; i++)
     {
-        if (!eh_campo_juncao(i, l1, l2))
+        if (!eh_campo_juncao(i, l2))
         {
             add_campos(&linha_mesclada, l2.colunas[i]);
         }
@@ -110,11 +111,11 @@ Linha mescla_linha(Linha l1, Linha l2)
     return linha_mesclada;
 }
 
-int eh_campo_juncao(int j, Linha l1, Linha l2)
+int eh_campo_juncao(int j, Linha l)
 {
-    for (int i = 0; i < l1.qtd_campos_juncao; i++)
+    for (int i = 0; i < l.qtd_campos_juncao; i++)
     {
-        if (j == atoi(l1.campos_juncao[i]) || j == atoi(l2.campos_juncao[i]))
+        if (j == atoi(l.campos_juncao[i]))
         {
             return 1;
         }

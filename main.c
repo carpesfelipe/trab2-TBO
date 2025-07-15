@@ -22,18 +22,18 @@ int main(int argc, char *argv[]){
     char **L2 = obtem_campos_juncao(argv[4], &tam);
 
     //cria os 2P arquivos
-    FILE *temp_files[P * 2]; 
-    criando_arquivos(temp_files, P);
+    //FILE *temp_files[P * 2]; 
+    //criando_arquivos(temp_files, P);
     // preenche os arquivos temporários com as m linhas ordenadas
     // para aquivo 1
-    preenche_arquivos_temporarios(temp_files, P, M, argv[5], L1, tam);
+    //preenche_arquivos_temporarios(temp_files, P, M, argv[5], L1, tam);
     //preenche_arquivos_temporarios(temp_files, P, M, argv[6], L2, tam);
     
     // if(x != 0) {
     //     return x; 
     // }
 
-    ordenar_blocos(temp_files, P, M, argv[5], L1, tam);
+    //ordenar_blocos(temp_files, P, M, argv[5], L1, tam);
     
     FILE * arq1=fopen("teste_juncao/1/arquivo1.txt","r");
     FILE * arq2=fopen("teste_juncao/1/arquivo2.txt","r");
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
         perror("Erro ao abrir arquivo de entrada");
         exit(1);
     }
-    //dado dois arquivos ordenado ja ordenados, imprime a juncao dos 2
+    //dado dois arquivos, ja ordenados, imprime a juncao dos 2
     imprime_arquivo_juncao(arq1,arq2,argv[7],L1,L2,M,tam);
 
     destroi_campos_juncao(L1, tam);

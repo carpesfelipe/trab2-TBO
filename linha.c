@@ -34,7 +34,7 @@ int compara_linhas(const void *linha1, const void *linha2)
         index1 = atoi(LINHA(linha1).campos_juncao[i]);
         index2 = atoi(LINHA(linha2).campos_juncao[i]);
 
-        int ehDiferenteString = strcmp(trim(LINHA(linha1).colunas[index1]), trim(LINHA(linha2).colunas[index2]));
+        int ehDiferenteString = strcmp(LINHA(linha1).colunas[index1], LINHA(linha2).colunas[index2]);
         if (ehDiferenteString!=0)
         {
             return ehDiferenteString;
@@ -55,32 +55,27 @@ Linha inicia_linha(char **campos_juncao, int qtd_campos)
     L.campos_juncao = campos_juncao;
     L.qtd_campos_juncao = qtd_campos;
     L.qtd_colunas = 0;
+    L.TAM_MAX_COLUNAS=100;
     return L;
 }
 
 void add_campos(Linha *linha_ptr, char *string)
 {
     char *token = strtok(string, ",");
-    int qtd = 100;
     while (token != NULL)
     {
-        if ((*linha_ptr).qtd_colunas >= qtd)
+        if ((*linha_ptr).qtd_colunas >= (*linha_ptr).TAM_MAX_COLUNAS)
         {
-            qtd *= 2;
-            char **tmp = realloc((*(linha_ptr)).colunas, qtd * sizeof(char *));
+            (*linha_ptr).TAM_MAX_COLUNAS *= 2;
+            char **tmp = realloc((*(linha_ptr)).colunas, (*linha_ptr).TAM_MAX_COLUNAS * sizeof(char *));
             if (!tmp)
             {
                 perror("Erro ao realocar colunas");
                 exit(1);
             }
-            //inicializa
-            for (int i = qtd/2; i < qtd; i++)
-            {
-                (*(linha_ptr)).colunas[i] = NULL;
-            }
-            (*(linha_ptr)).colunas = tmp;
         }
-        (*(linha_ptr)).colunas[(*linha_ptr).qtd_colunas] = strdup(token);
+        
+        (*(linha_ptr)).colunas[(*linha_ptr).qtd_colunas] = strdup(trim(token));
         (*(linha_ptr)).qtd_colunas++;
         token = strtok(NULL, ",");
     }
@@ -99,7 +94,7 @@ void imprime_linhas_arquivo(Linha *vet_linha, FILE *file, int M)
             }
             else
             {
-                fprintf(file, "%s", vet_linha[i].colunas[j]);
+                fprintf(file, "%s\n", vet_linha[i].colunas[j]);
             }
         }
     }
