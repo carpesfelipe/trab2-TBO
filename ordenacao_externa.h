@@ -6,7 +6,7 @@
 
 char **obtem_campos_juncao(char *linha, int *tamanho);
 void destroi_campos_juncao(char **l, int tam);
-void criando_arquivos(FILE **temp_files, int P);
+void cria_arquivos_temporarios(FILE **temp_files, int P);
 int compara_linhas(const void *a, const void *b);
 int preenche_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_file, char **L, int tam);
 

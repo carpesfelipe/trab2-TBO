@@ -1,7 +1,7 @@
 #include "linha.h"
 #include <ctype.h>
 #include <string.h>
-
+//Elimina os caracteres em branco e adiciona '\0' ao final das strings
 char *trim(char *str) {
     char *end;
 
@@ -107,7 +107,7 @@ void destroi_linha(Linha l)
     }
     free(l.colunas);
 }
-
+//função auxiliar para debug
 void imprime_linha(Linha linha){
     for(int i=0;i<linha.qtd_colunas;i++){
         if(i==linha.qtd_colunas-1){

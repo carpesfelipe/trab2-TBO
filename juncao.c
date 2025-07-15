@@ -1,8 +1,10 @@
 #include "juncao.h"
-
+//Dado dois arquivos ordenados, imprime junção(combinação dos registros) dos dois arquivos de 
+//cada um em CAMINHO_ARQUIVO_SAIDA
 void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida, char **L1, char **L2, int M, int qtd_campos_juncao)
 {
     FILE *arquivo_saida = fopen(caminho_arquivo_saida, "w");
+    printf("%s",caminho_arquivo_saida);
     if (arquivo_saida == NULL)
     {
         perror("Erro ao abrir arquivo de saída");
@@ -26,8 +28,12 @@ void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida,
         int cmp = compara_linhas((const void *)&linha1, (const void *)&linha2);
         if ((cmp == 0))
         {
+            //caso as linhas sejam iguais(cmp==0) fazemos a mesclagem da linha(com k1+k2-l campos)
+            //e armazenamos o resultado em um vetor de Linhas
             vet_linhas[tam_bloco] = mescla_linha(linha1, linha2);
             tam_bloco++;
+            //destruímos os itens dentro das linhas utilizadas para mesclar
+            //e avançamos nos dois arquivos, criando novas Linhas para serem comparadas
             destroi_linha(linha1);
             destroi_linha(linha2);
             linha1 = inicia_linha(L1, qtd_campos_juncao);
@@ -37,6 +43,8 @@ void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida,
             add_campos(&linha1, linha_lida1);
             add_campos(&linha2, linha_lida2);
         }
+        //caso a Linha do primeiro arquivo seja "menor" do que a do segundo, destruímos a Linha do primeiro
+        //e avançamos no arquivo 1, comparando-a com a mesma linha do segundo arquivo.
         else if (cmp < 0)
         {
             destroi_linha(linha1);
@@ -44,6 +52,8 @@ void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida,
             fim_de_arquivo1 = getline(&linha_lida1, &aux1, arq1);
             add_campos(&linha1,linha_lida1);
         }
+        //caso a Linha do segundo arquivo seja "menor" do que a do primeiro, destruímos a Linha do segundo
+        //e avançamos no arquivo 2, comparando-a com a mesma linha do primeiro arquivo.
         else
         {          
             destroi_linha(linha2);
@@ -51,7 +61,8 @@ void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida,
             fim_de_arquivo2 = getline(&linha_lida2, &aux1, arq2);
             add_campos(&linha2,linha_lida2);
         }
-
+        //caso tenhamos um bloco de M linhas mescladas, devemos escrever no arquivo 
+        //para liberar a memória principal
         if (tam_bloco == M)
         {
             imprime_linhas_arquivo(vet_linhas, arquivo_saida, M);
@@ -63,7 +74,8 @@ void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida,
         }
 
     }
-
+    //Se o resto da divisão de N/M for diferente de zero então ainda restam linhas 
+    //a serem escritas no arquivo
     if (tam_bloco > 0)
     {
         imprime_linhas_arquivo(vet_linhas, arquivo_saida, tam_bloco);
@@ -110,7 +122,7 @@ Linha mescla_linha(Linha l1, Linha l2)
 
     return linha_mesclada;
 }
-
+//verifica se um indice corresponde ao campo de junção de uma Linha
 int eh_campo_juncao(int j, Linha l)
 {
     for (int i = 0; i < l.qtd_campos_juncao; i++)
@@ -123,6 +135,3 @@ int eh_campo_juncao(int j, Linha l)
     return 0;
 }
 
-void compara_arquivo(FILE * file1,FILE *file2){
-    
-}

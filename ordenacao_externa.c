@@ -5,7 +5,7 @@
 #include "linha.h"
 typedef struct linha Linha;
 
-// Funcao para obter os campos de junção de uma linha
+//Funcao para separar os campos de juncao em um vetor de strings
 char **obtem_campos_juncao(char *linha, int *tamanho)
 {
     int qtd = 100;
@@ -47,8 +47,8 @@ void destroi_campos_juncao(char **l, int tam)
     }
     free(l);
 }
-
-void criando_arquivos(FILE **temp_files, int P, int M, char *input_file)
+//cria os 2P dispositivos auxiliares para ordenacao externa
+void cria_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_file)
 {
     for (int i = 0; i < P * 2; i++)
     {
@@ -71,7 +71,7 @@ void criando_arquivos(FILE **temp_files, int P, int M, char *input_file)
         }
     }
 }
-
+//preenche os arquivos temporários em blocos de M registros(Linhas) ordenados 
 void preenche_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_file, char **L, int tam)
 {
     // Abre arquivo
@@ -81,14 +81,12 @@ void preenche_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_
         perror("Erro ao abrir arquivo de entrada");
         exit(1);
     }
-    // Pega primeira linha
     char *linha_lida = NULL;
     int tam_bloco = 0; // conta quantas linhas tem no bloco
     size_t aux = 0;
     int current_temp_file_index = P; // começa a preencher a partir do arquivo P (que é o arquivo medio)
     Linha *vet_linhas = calloc(M, sizeof(Linha));
     // Lê o arquivo de entrada linha por linha
-    
     while (getline(&linha_lida, &aux, arquivo1) != -1)
     {
         
