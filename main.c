@@ -21,7 +21,7 @@ int main(int argc, char *argv[]){
     FILE *temp_files[P * 2]; 
     cria_arquivos_temporarios(temp_files, P);
     preenche_arquivos_temporarios(temp_files, P, M, argv[5], L1, qtd_campos_juncao);
-    //ordenar_blocos(temp_files, P, M, argv[5], L1, qtd_campos_juncao);
+    ordenar_blocos(temp_files, P, M, argv[5], L1, qtd_campos_juncao);
 
     // para arq2
     //preenche_arquivos_temporarios(temp_files, P, M, argv[6], L2, qtd_campos_juncao);

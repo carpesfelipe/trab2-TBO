@@ -144,7 +144,7 @@ void imprime_linha_no_destino(Linha linha, FILE *arquivo_destino) {
         for (int i = 0; i < linha.qtd_colunas; i++) {
             fprintf(arquivo_destino, "%s", linha.colunas[i]);
             if (i < linha.qtd_colunas - 1) {
-                fprintf(arquivo_destino, " "); // Adiciona espaço entre colunas
+                fprintf(arquivo_destino, ","); // Adiciona espaço entre colunas
             }
         }
         fprintf(arquivo_destino, "\n");
