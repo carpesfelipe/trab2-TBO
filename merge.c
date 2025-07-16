@@ -293,6 +293,5 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
         tamanho_bloco_ordenado_atual *= P; // Aumenta o tamanho do bloco ordenado atual para o próximo loop
     }
 
-    //aqui passar o conteudo final pro arquivo que eu quero a saida
-    
+    // aqui ainda fazer a logica pra escrever o conteudo no arquivo saida desejado
 }
