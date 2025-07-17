@@ -98,6 +98,10 @@ void preenche_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_
         {
             qsort(vet_linhas, M, sizeof(Linha), compara_linhas);
             imprime_linhas_arquivo(vet_linhas, temp_files[current_temp_file_index], tam_bloco);
+
+            // Adiciona o ponto de quebra (FIMBLOCO) imediatamente após o bloco
+            fprintf(temp_files[current_temp_file_index], "FIMBLOCO\n");
+
             for (int i = 0; i < tam_bloco; i++)
             {
                 destroi_linha(vet_linhas[i]);  
@@ -114,6 +118,10 @@ void preenche_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_
     {
         qsort(vet_linhas, tam_bloco, sizeof(Linha), compara_linhas);
         imprime_linhas_arquivo(vet_linhas, temp_files[current_temp_file_index], tam_bloco);
+
+        // Adiciona o ponto de quebra (FIMBLOCO) imediatamente após o bloco
+        fprintf(temp_files[current_temp_file_index], "FIMBLOCO\n");
+
         for (int i = 0; i < tam_bloco; i++)
         {
             
