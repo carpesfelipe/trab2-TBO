@@ -337,6 +337,7 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
             fprintf(arquivo_final, "%s", linha_lida); 
         }
         // Copia o conteúdo do arquivo temporário de destino para o arquivo final
+        free(linha_lida);
         fclose(arquivo_destino_final);
         fclose(arquivo_final);
     }
