@@ -33,21 +33,19 @@ int main(int argc, char *argv[]){
     ordenar_blocos(temp_files2, P, M, argv[6], L2, qtd_campos_juncao, arq2);
 
 
-    // // FILE * arq1=fopen("teste_juncao/1/arquivo1.txt","r");
-    // // FILE * arq2=fopen("teste_juncao/1/arquivo2.txt","r");
-    //  FILE * arq1=fopen("teste_juncao/2/arquivo1.txt","r");
-    //  FILE * arq2=fopen("teste_juncao/2/arquivo2.txt","r");
-    // if (arq1 == NULL || arq2==NULL)
-    // {
-    //     perror("Erro ao abrir arquivo de entrada");
-    //     exit(1);
-    // }
-    // imprime_arquivo_juncao(arq1,arq2,argv[7],L1,L2,M,qtd_campos_juncao);
+    FILE * arq1_ordenado=fopen("arq1_0.txt","r");
+    FILE * arq2_ordenado=fopen("arq2_0.txt","r");
+    if (arq1 == NULL || arq2==NULL)
+    {
+        perror("Erro ao abrir arquivo de entrada");
+        exit(1);
+    }
+    imprime_arquivo_juncao(arq1_ordenado,arq2_ordenado,argv[7],L1,L2,M,qtd_campos_juncao);
 
     destroi_campos_juncao(L1, qtd_campos_juncao);
     destroi_campos_juncao(L2, qtd_campos_juncao);
-    // fclose(arq1);
-    // fclose(arq2);
+    fclose(arq1_ordenado);
+    fclose(arq2_ordenado);
 
     return 0;
 }
