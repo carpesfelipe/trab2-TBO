@@ -183,7 +183,6 @@ void realizar_merge(Linha *vetor_proximas_linhas, int P, FILE **arquivo_fonte, F
                 printf("tamanho atual do bloco: %d, numero de linhas do arquivo de entrada: %d\n", tamanho_atual_bloco, n_linhas_arquivo_entrada);
                 fprintf(arquivo_destino, "FIMBLOCO\n"); // Marca o fim do bloco
             }
-            // fprintf(arquivo_destino, "FIMBLOCO\n"); //continuar marcacao p entender
             break;
         }
 
@@ -339,5 +338,9 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
         // Copia o conteúdo do arquivo temporário de destino para o arquivo final
         fclose(arquivo_destino_final);
         fclose(arquivo_final);
+        if (linha_lida != NULL) {
+            free(linha_lida);
+            linha_lida = NULL;
+        }
     }
 }
