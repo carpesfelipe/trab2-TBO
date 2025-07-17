@@ -48,14 +48,14 @@ void destroi_campos_juncao(char **l, int tam)
     free(l);
 }
 //cria os 2P dispositivos auxiliares para ordenacao externa
-void cria_arquivos_temporarios(FILE **temp_files, int P, int M, char *input_file)
+void cria_arquivos_temporarios(FILE **temp_files, int P, char *arq)
 {
     for (int i = 0; i < P * 2; i++)
     {
         char nome[260];
 
-        // Cria o nome do arquivo temporário
-        sprintf(nome, "%d.txt", i);
+        // Cria o nome do arquivo temporário identificando qual o arquivo e o índice
+        sprintf(nome, "%s%d.txt", arq, i);
         // Abre o arquivo temporário para leitura e escrita
 
         temp_files[i] = fopen(nome, "w+"); // uso de w+ para permitir leitura e escrita

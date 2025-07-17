@@ -6,10 +6,10 @@
 #include "linha.h"
 #include <sys/types.h>
 
-void limpar_arquivos_destino(FILE **temp_files, int indice_arquivo_destino, int P) {
+void limpar_arquivos_destino(FILE **temp_files, int indice_arquivo_destino, int P, char *arq) {
     for (int i = indice_arquivo_destino; i < indice_arquivo_destino+P; i++) {
         char nome[260];
-        sprintf(nome, "%d.txt", i);
+        sprintf(nome, "%s%d.txt", arq, i);
         FILE *file = fopen(nome, "w");
         if (file == NULL) {
             perror("Erro ao limpar arquivo de destino");
@@ -199,7 +199,7 @@ void realizar_merge(Linha *vetor_proximas_linhas, int P, FILE **arquivo_fonte, F
     }
 }
 
-void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L, int tam) {
+void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L, int tam, char *arq) {
     int tamanho_bloco_ordenado_atual = M; // os primeiros arquivos ordenados começam com tamanho M (mudam a cada iteração)
     int inicio_arquivo_fonte = P; //inicialmente o arquivo medio contem o inicio da primeira ordenação (varia inicialmente de P ate 2P-1)
     int inicio_arquivo_destino = 0; // Inicia as escritas na primeira metade dos arquivos temporários (varia inicialmente de 0 a P-1)
@@ -237,12 +237,12 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
                 }
                 
 
-                sprintf(nome, "%d.txt", indice_arquivo_real_fonte);
+                sprintf(nome, "%s%d.txt", arq, indice_arquivo_real_fonte);
                 arquivos_fontes_para_esta_rodada[j] = fopen(nome, "r"); // abre o arq p leitura e associa ao vetor que vai ser usado pra manipular o vetor de proximas linhas
             }
 
             // abre o arquivo temporário de destino para escrita
-            sprintf(nome, "%d.txt", indice_arquivo_destino_atual);
+            sprintf(nome, "%s%d.txt", arq, indice_arquivo_destino_atual);
             arquivo_destino_para_esta_rodada = fopen(nome, "a"); //ATUALIZACAO (p nao apagar o conteudo anterior)
             // printf("Abrindo arquivo temporário de destino %s para escrita...\n", nome);
             if (arquivo_destino_para_esta_rodada == NULL) {
@@ -304,11 +304,14 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
             tamanho_bloco_ordenado_atual = n_linhas_arquivo_entrada; // Garante que não ultrapasse o número total de linhas
         }
 
-        limpar_arquivos_destino(temp_files, inicio_arquivo_destino, P); // limpa os arquivos que vamos escrever
+        limpar_arquivos_destino(temp_files, inicio_arquivo_destino, P, arq); // limpa os arquivos que vamos escrever
     }
     // passar conteudo do arquivo temporario de destino para o arquivo de saida final(que deve ser sempre o zero)
     if(indice_ultima_escrita != 0){
-        FILE *arquivo_final = fopen("0.txt", "w"); // Abre o arquivo
+        char nome_arquivo[260];
+        sprintf(nome_arquivo, "%s0.txt", arq); // Abre o arquivo
+        FILE *arquivo_final = fopen(nome_arquivo, "w");
+        // FILE *arquivo_final = fopen("%s0.txt", "w"); // Abre o arquivo
         if (arquivo_final == NULL) {
             perror("Erro ao abrir arquivo final para escrita");
             exit(EXIT_FAILURE);
@@ -316,7 +319,7 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
 
         //abrir o arquivo de destino final de indice indice_ultima_escrita e escrever no arquivo_final
         char nome_arquivo_destino[260];
-        sprintf(nome_arquivo_destino, "%d.txt", indice_ultima_escrita);
+        sprintf(nome_arquivo_destino, "%s%d.txt", arq, indice_ultima_escrita);
         FILE *arquivo_destino_final = fopen(nome_arquivo_destino, "r");
         if (arquivo_destino_final == NULL) {
             perror("Erro ao abrir arquivo temporário de destino para leitura");
