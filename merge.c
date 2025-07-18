@@ -123,6 +123,8 @@ Linha ler_proxima_linha(FILE *arquivo_fonte, Linha *linha_anterior, char **campo
     // Tenta ler a próxima linha do arquivo
     ssize_t read = getline(&linha_lida, &len, arquivo_fonte);
 
+    Linha nova_linha = inicia_linha(campos_juncao, qtd_campos_juncao);
+
     if (read != -1) {
         // Remove o '\n' se presente
         if (read > 0 && linha_lida[read - 1] == '\n') {
@@ -131,32 +133,28 @@ Linha ler_proxima_linha(FILE *arquivo_fonte, Linha *linha_anterior, char **campo
 
         // Verifica se é o delimitador FIMBLOCO
         if (strcmp(linha_lida, "FIMBLOCO") == 0) {
-            Linha nova_linha = inicia_linha(campos_juncao, qtd_campos_juncao);
-            nova_linha.colunas = NULL; // Sinaliza fim do bloco para o merge
-            *linhas_lidas_do_bloco_ptr = tamanho_do_bloco_esperado; // "Força" o contador a indicar que o bloco terminou
-            if (linha_lida != NULL) { 
-                free(linha_lida); 
+            if (nova_linha.colunas != NULL) { // Garante que não está tentando liberar um ponteiro NULL
+                free(nova_linha.colunas);
+                nova_linha.colunas = NULL; 
             }
-            return nova_linha;
+            *linhas_lidas_do_bloco_ptr = tamanho_do_bloco_esperado;
         } else {
-            // É uma linha de dado válida
-            Linha nova_linha = inicia_linha(campos_juncao, qtd_campos_juncao);
             add_campos(&nova_linha, linha_lida);
             (*linhas_lidas_do_bloco_ptr)++; // Incrementa o contador para o bloco atual
-            if (linha_lida != NULL) { 
-                free(linha_lida); 
-            }
-            return nova_linha;
         }
-    } else { // Fim do arquivo ou erro na leitura
-        // Sinaliza o fim do arquivo/blocos
-        Linha nova_linha = inicia_linha(campos_juncao, qtd_campos_juncao);
-        nova_linha.colunas = NULL; 
-        if (linha_lida != NULL) { 
-            free(linha_lida); 
+    } else { 
+
+        if (nova_linha.colunas != NULL) {
+            free(nova_linha.colunas);
+            nova_linha.colunas = NULL;
         }
-        return nova_linha;
+        // return nova_linha;
     }
+
+    if (linha_lida != NULL) { 
+        free(linha_lida); 
+    }
+    return nova_linha;
 }
 
 
