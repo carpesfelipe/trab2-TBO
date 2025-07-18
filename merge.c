@@ -209,6 +209,44 @@ void realizar_merge(Linha *vetor_proximas_linhas, int P, FILE **arquivo_fonte, F
     }
 }
 
+void passa_conteudo_final_para_arq0(char *arq, int indice_ultima_escrita)
+{
+    char nome_arquivo[260];
+        sprintf(nome_arquivo, "%s0.txt", arq); // Abre o arquivo
+        FILE *arquivo_final = fopen(nome_arquivo, "w");
+        // FILE *arquivo_final = fopen("%s0.txt", "w"); // Abre o arquivo
+        if (arquivo_final == NULL) {
+            perror("Erro ao abrir arquivo final para escrita");
+            exit(EXIT_FAILURE);
+        }
+
+        //abrir o arquivo de destino final de indice indice_ultima_escrita e escrever no arquivo_final
+        char nome_arquivo_destino[260];
+        sprintf(nome_arquivo_destino, "%s%d.txt", arq, indice_ultima_escrita);
+        FILE *arquivo_destino_final = fopen(nome_arquivo_destino, "r");
+        if (arquivo_destino_final == NULL) {
+            perror("Erro ao abrir arquivo temporário de destino para leitura");
+            fclose(arquivo_final);
+            exit(EXIT_FAILURE);
+        }
+
+        char *linha_lida = NULL;
+        size_t len = 0;
+
+        while(getline(&linha_lida, &len, arquivo_destino_final) != -1) {
+            // if(strcmp(linha_lida, "FIMBLOCO\n") == 0) {
+            //     continue;
+            // }
+            fprintf(arquivo_final, "%s", linha_lida); 
+        }
+        // Copia o conteúdo do arquivo temporário de destino para o arquivo final
+        fclose(arquivo_destino_final);
+        fclose(arquivo_final);
+        if (linha_lida != NULL) {
+            free(linha_lida);
+            linha_lida = NULL;
+        }
+}
 void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L, int tam, char *arq) {
     int tamanho_bloco_ordenado_atual = M; // os primeiros arquivos ordenados começam com tamanho M (mudam a cada iteração)
     int inicio_arquivo_fonte = P; //inicialmente o arquivo medio contem o inicio da primeira ordenação (varia inicialmente de P ate 2P-1)
@@ -224,7 +262,7 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
     int n_linhas_arquivo_entrada = numero_linhas_arquivo(arquivo_original_entrada);
     fclose(arquivo_original_entrada); // Fecha o arquivo após usar
 
-    int indice_ultima_escrita = 0;
+    int indice_ultima_escrita = -1 ;
 
     while (tamanho_bloco_ordenado_atual < n_linhas_arquivo_entrada) // Enquanto todos os dados não estiverem em um único bloco ordenado
     {
@@ -245,7 +283,6 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
                 if(indice_arquivo_real_fonte >= inicio_arquivo_fonte + P){
                     indice_arquivo_real_fonte = inicio_arquivo_fonte;
                 }
-                
 
                 sprintf(nome, "%s%d.txt", arq, indice_arquivo_real_fonte);
                 arquivos_fontes_para_esta_rodada[j] = fopen(nome, "r"); // abre o arq p leitura e associa ao vetor que vai ser usado pra manipular o vetor de proximas linhas
@@ -317,42 +354,10 @@ void ordenar_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L,
         limpar_arquivos_destino(temp_files, inicio_arquivo_destino, P, arq); // limpa os arquivos que vamos escrever
     }
     // passar conteudo do arquivo temporario de destino para o arquivo de saida final(que deve ser sempre o zero)
-    if(indice_ultima_escrita != 0){
-        char nome_arquivo[260];
-        sprintf(nome_arquivo, "%s0.txt", arq); // Abre o arquivo
-        FILE *arquivo_final = fopen(nome_arquivo, "w");
-        // FILE *arquivo_final = fopen("%s0.txt", "w"); // Abre o arquivo
-        if (arquivo_final == NULL) {
-            perror("Erro ao abrir arquivo final para escrita");
-            exit(EXIT_FAILURE);
-        }
-
-        //abrir o arquivo de destino final de indice indice_ultima_escrita e escrever no arquivo_final
-        char nome_arquivo_destino[260];
-        sprintf(nome_arquivo_destino, "%s%d.txt", arq, indice_ultima_escrita);
-        FILE *arquivo_destino_final = fopen(nome_arquivo_destino, "r");
-        if (arquivo_destino_final == NULL) {
-            perror("Erro ao abrir arquivo temporário de destino para leitura");
-            fclose(arquivo_final);
-            exit(EXIT_FAILURE);
-        }
-
-        char *linha_lida = NULL;
-        size_t len = 0;
-
-        while(getline(&linha_lida, &len, arquivo_destino_final) != -1) {
-            // if(strcmp(linha_lida, "FIMBLOCO\n") == 0) {
-            //     continue;
-            // }
-            fprintf(arquivo_final, "%s", linha_lida); 
-        }
-        // Copia o conteúdo do arquivo temporário de destino para o arquivo final
-        // free(linha_lida);
-        fclose(arquivo_destino_final);
-        fclose(arquivo_final);
-        if (linha_lida != NULL) {
-            free(linha_lida);
-            linha_lida = NULL;
-        }
+    if(indice_ultima_escrita > 0){
+        passa_conteudo_final_para_arq0(arq, indice_ultima_escrita);
+    }
+    else if(indice_ultima_escrita == -1){ //caso n precisou de merge, ele n vai saber o indice da ultima escrita
+        passa_conteudo_final_para_arq0(arq, inicio_arquivo_fonte);
     }
 }
