@@ -4,7 +4,6 @@
 void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida, char **L1, char **L2, int M, int qtd_campos_juncao)
 {
     FILE *arquivo_saida = fopen(caminho_arquivo_saida, "w");
-    printf("%s",caminho_arquivo_saida);
     if (arquivo_saida == NULL)
     {
         perror("Erro ao abrir arquivo de saída");
@@ -97,7 +96,6 @@ Linha mescla_linha(Linha l1, Linha l2)
     Linha linha_mesclada;
     linha_mesclada = inicia_linha(l1.campos_juncao, l1.qtd_campos_juncao);
     int index;
-    printf("linha mesclada:");
     for (int i = 0; i < l1.qtd_campos_juncao; i++)
     {
         index = atoi(l1.campos_juncao[i]);
