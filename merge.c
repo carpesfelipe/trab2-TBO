@@ -181,22 +181,6 @@ Linha ler_proxima_linha(FILE *arquivo_fonte, Linha *linha_anterior, char **campo
     return nova_linha;
 }
 
-void imprime_linha_arquivo(Linha linha, FILE *arquivo_destino)
-{
-    if (linha.colunas != NULL && linha.qtd_colunas > 0)
-    {
-        for (int i = 0; i < linha.qtd_colunas; i++)
-        {
-            fprintf(arquivo_destino, "%s", linha.colunas[i]);
-            if (i < linha.qtd_colunas - 1)
-            {
-                fprintf(arquivo_destino, ",");
-            }
-        }
-        fprintf(arquivo_destino, "\n");
-    }
-}
-
 void realizar_merge(Linha *vetor_proximas_linhas, int P, FILE **arquivo_fonte, FILE *arquivo_destino, char **campos_juncao, int qtd_campos_juncao, int tamanho_atual_bloco, int *linhas_lidas_bloco, int n_linhas_arquivo_entrada)
 {
 

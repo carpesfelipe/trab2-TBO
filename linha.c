@@ -61,7 +61,7 @@ void add_campos(Linha *linha_ptr, char *string)
     }
 }
 
-void imprime_linhas_arquivo(Linha *vet_linha, FILE *file, int M)
+void imprime_vet_linhas_arquivo(Linha *vet_linha, FILE *file, int M)
 {
 
     for (int i = 0; i < M; i++)
@@ -77,6 +77,21 @@ void imprime_linhas_arquivo(Linha *vet_linha, FILE *file, int M)
                 fprintf(file, "%s\n", vet_linha[i].colunas[j]);
             }
         }
+    }
+}
+void imprime_linha_arquivo(Linha linha, FILE *arquivo_destino)
+{
+    if (linha.colunas != NULL && linha.qtd_colunas > 0)
+    {
+        for (int i = 0; i < linha.qtd_colunas; i++)
+        {
+            fprintf(arquivo_destino, "%s", linha.colunas[i]);
+            if (i < linha.qtd_colunas - 1)
+            {
+                fprintf(arquivo_destino, ",");
+            }
+        }
+        fprintf(arquivo_destino, "\n");
     }
 }
 void destroi_linha(Linha l)

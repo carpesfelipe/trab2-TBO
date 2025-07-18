@@ -22,7 +22,8 @@ Linha inicia_linha(char ** campos_juncao,int qtd_campos_juncao);
 
 void add_campos(Linha * linha_ptr, char * string);
 
-void imprime_linhas_arquivo(Linha * vet_linha,FILE * file, int M);
+void imprime_vet_linhas_arquivo(Linha * vet_linha,FILE * file, int M);
+void imprime_linha_arquivo(Linha linha,FILE * file);
 char * trim(char * str);
 void destroi_linha(Linha l);
 void imprime_linha(Linha linha);

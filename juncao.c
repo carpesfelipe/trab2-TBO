@@ -67,7 +67,7 @@ void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida,
         //para liberar a memória principal
         if (tam_bloco == M)
         {
-            imprime_linhas_arquivo(vet_linhas, arquivo_saida, M);
+            imprime_vet_linhas_arquivo(vet_linhas, arquivo_saida, M);
             for (int i = 0; i < tam_bloco; i++)
             {
                 destroi_linha(vet_linhas[i]);
@@ -80,7 +80,7 @@ void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida,
     //a serem escritas no arquivo
     if (tam_bloco > 0)
     {
-        imprime_linhas_arquivo(vet_linhas, arquivo_saida, tam_bloco);
+        imprime_vet_linhas_arquivo(vet_linhas, arquivo_saida, tam_bloco);
         for (int i = 0; i < tam_bloco; i++)
         {
             destroi_linha(vet_linhas[i]);

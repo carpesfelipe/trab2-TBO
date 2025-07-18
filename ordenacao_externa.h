@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
-
+#
 char **obtem_campos_juncao(char *linha, int *tamanho);
 void destroi_campos_juncao(char **l, int tam);
 void cria_arquivos_temporarios(FILE **temp_files, int P, char *arq);
