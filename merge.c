@@ -21,10 +21,12 @@ void limpar_arquivos_destino(FILE **temp_files, int indice_arquivo_destino, int 
 
 int numero_linhas_arquivo(FILE *arquivo) { 
     int linhas = 0;
-    char buffer[1024];
-    while (fgets(buffer, sizeof(buffer), arquivo) != NULL) {
+    char *buffer=NULL;
+    size_t n;
+    while (getline(&buffer,&n,arquivo)!=-1) {
         linhas++;
     }
+    free(buffer);
     rewind(arquivo); // Volta ao início do arquivo
     return linhas;
 }
