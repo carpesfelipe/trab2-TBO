@@ -24,6 +24,12 @@ diff:
 	diff saidas/out3.txt examples/3/file.txt
 clean:
 	rm -f trab2 *.txt
+zip:
+TARNAME = trab2
+FILES = *.c *.h Makefile
+
+tarball:
+	tar -czvf $(TARNAME).tar.gz $(FILES)
 clean_saidas:
 	rm -f trab2 saidas/*.txt
 
