@@ -1,27 +1,7 @@
 #include "linha.h"
 #include <ctype.h>
 #include <string.h>
-//Elimina os caracteres em branco e adiciona '\0' ao final das strings
-char *trim(char *str) {
-    char *end;
 
-    // Avança até o primeiro caractere não branco
-    while (isspace((unsigned char)*str)) str++;
-
-    if (*str == 0)  // string vazia ou só com espaços
-        return str;
-
-    // Vai para o fim da string
-    end = str + strlen(str) - 1;
-
-    // Anda para trás enquanto houver espaço no final
-    while (end > str && isspace((unsigned char)*end)) end--;
-
-    // Coloca o terminador de string após o último caractere válido
-    *(end + 1) = '\0';
-
-    return str;
-}
 
 int compara_linhas(const void *linha1, const void *linha2)
 {
@@ -116,4 +96,25 @@ void imprime_linha(Linha linha){
             printf("%s,",linha.colunas[i]);
         }
     }
+}
+//Elimina os caracteres em branco e adiciona '\0' ao final das strings
+char *trim(char *str) {
+    char *end;
+
+    // Avança até o primeiro caractere não branco
+    while (isspace((unsigned char)*str)) str++;
+
+    if (*str == 0)  // string vazia ou só com espaços
+        return str;
+
+    // Vai para o fim da string
+    end = str + strlen(str) - 1;
+
+    // Anda para trás enquanto houver espaço no final
+    while (end > str && isspace((unsigned char)*end)) end--;
+
+    // Coloca o terminador de string após o último caractere válido
+    *(end + 1) = '\0';
+
+    return str;
 }   
