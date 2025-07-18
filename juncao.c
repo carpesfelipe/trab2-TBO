@@ -1,8 +1,15 @@
 #include "juncao.h"
 //Dado dois arquivos ordenados, imprime junção(combinação dos registros) dos dois arquivos de 
 //cada um em CAMINHO_ARQUIVO_SAIDA
-void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida, char **L1, char **L2, int M, int qtd_campos_juncao)
+void imprime_arquivo_juncao(char *caminho_arquivo_saida, char **L1, char **L2, int M, int qtd_campos_juncao)
 {
+    FILE * arq1=fopen("arq1_0.txt","r");
+    FILE * arq2=fopen("arq2_0.txt","r");
+    if (arq1 == NULL || arq2==NULL)
+    {
+        perror("Erro ao abrir arquivo de entrada");
+        exit(1);
+    }
     FILE *arquivo_saida = fopen(caminho_arquivo_saida, "w");
     if (arquivo_saida == NULL)
     {
@@ -86,11 +93,13 @@ void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida,
             destroi_linha(vet_linhas[i]);
         }
     }
-    destroi_linha(linha1);
-    destroi_linha(linha2);
+    fclose(arquivo_saida);
     free(linha_lida1);
     free(linha_lida2);
-    fclose(arquivo_saida);
+    fclose(arq1);
+    fclose(arq2);
+    destroi_linha(linha1);
+    destroi_linha(linha2);
 }
 
 // retorna uma linha com os campos de juncao e o restante das colunas de cada linha

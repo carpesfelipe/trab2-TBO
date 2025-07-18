@@ -31,21 +31,11 @@ int main(int argc, char *argv[]){
     cria_arquivos_temporarios(temp_files2, P, arq2);
     preenche_arquivos_temporarios(temp_files2, P, M, argv[6], L2, qtd_campos_juncao);
     ordenar_blocos(temp_files2, P, M, argv[6], L2, qtd_campos_juncao, arq2);
-
-
-    FILE * arq1_ordenado=fopen("arq1_0.txt","r");
-    FILE * arq2_ordenado=fopen("arq2_0.txt","r");
-    if (arq1 == NULL || arq2==NULL)
-    {
-        perror("Erro ao abrir arquivo de entrada");
-        exit(1);
-    }
-    imprime_arquivo_juncao(arq1_ordenado,arq2_ordenado,argv[7],L1,L2,M,qtd_campos_juncao);
+    imprime_arquivo_juncao(argv[7],L1,L2,M,qtd_campos_juncao);
 
     destroi_campos_juncao(L1, qtd_campos_juncao);
     destroi_campos_juncao(L2, qtd_campos_juncao);
-    fclose(arq1_ordenado);
-    fclose(arq2_ordenado);
+   
 
     return 0;
 }
