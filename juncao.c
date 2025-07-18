@@ -24,6 +24,9 @@ void imprime_arquivo_juncao(FILE *arq1, FILE *arq2, char *caminho_arquivo_saida,
 
     while ((fim_de_arquivo1 != -1) && (fim_de_arquivo2 != -1))
     {
+        if(!strcmp(linha1.colunas[0],"FIMBLOCO") || !strcmp(linha2.colunas[0],"FIMBLOCO")){
+            break;
+        }
         int cmp = compara_linhas((const void *)&linha1, (const void *)&linha2);
         if ((cmp == 0))
         {
