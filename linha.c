@@ -53,6 +53,7 @@ void add_campos(Linha *linha_ptr, char *string)
                 perror("Erro ao realocar colunas");
                 exit(1);
             }
+            linha_ptr->colunas = tmp;
         }
         
         (*(linha_ptr)).colunas[(*linha_ptr).qtd_colunas] = strdup(trim(token));
