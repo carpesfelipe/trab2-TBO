@@ -87,7 +87,7 @@ void inicializa_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_rodad
         ssize_t read;
         int indice_linha = 0;
         while ((read = getline(&linha_lida, &len, current_file)) != -1){
-            if (!(strcmp(linha_lida, "FIMBLOCO") == 0) || indice_linha != (qtd_iteracoes * (tamanho_atual_bloco + 1))){
+            if ((strcmp(linha_lida, "FIMBLOCO") != 0) && indice_linha == (qtd_iteracoes * (tamanho_atual_bloco + 1))){
                 // Se não é FIMBLOCO e estamos no bloco certo, é a primeira linha válida do bloco
                 add_campos(&(vetor_proximas_linhas[i]), linha_lida);
                 linhas_lidas_bloco[i]++;
