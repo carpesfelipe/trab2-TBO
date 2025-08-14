@@ -114,11 +114,11 @@ void inicializa_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_rodad
         //     free(linha_lida);
         //     linha_lida = NULL;
         // }
-    }
-    if (linha_lida != NULL)
-    {
-        free(linha_lida);
-        linha_lida = NULL;
+        if (linha_lida != NULL)
+        {
+            free(linha_lida);
+            linha_lida = NULL;
+        }
     }
 }
 
@@ -132,6 +132,7 @@ Linha le_proxima_linha(FILE *arquivo_fonte, Linha *linha_anterior, char **campos
     if (linha_anterior->colunas != NULL){
         destroi_linha(*linha_anterior);
         linha_anterior->colunas = NULL;
+        linha_anterior->qtd_colunas=0;
     }
 
     // Tenta ler a próxima linha do arquivo

@@ -31,11 +31,12 @@ void ordena_linhas(Linha *vet_linhas, int qtd_linhas)
 Linha inicia_linha(char **campos_juncao, int qtd_campos)
 {
     Linha L;
-    L.colunas = calloc(100, sizeof(char *));
+    //diminuição da quantidade de callocs
+    L.colunas = calloc(20, sizeof(char *));
     L.campos_juncao = campos_juncao;
     L.qtd_campos_juncao = qtd_campos;
     L.qtd_colunas = 0;
-    L.TAM_MAX_COLUNAS=100;
+    L.TAM_MAX_COLUNAS=20;
     return L;
 }
 

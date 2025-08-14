@@ -20,7 +20,7 @@ void imprime_arquivo_juncao(char *caminho_arquivo_saida, char **L1, char **L2, i
     char *linha_lida1 = NULL;
     char *linha_lida2 = NULL;
     //Linha vet_linhas[M];
-    Linha *vet_linhas=calloc(M,sizeof(Linha));
+    //Linha *vet_linhas=calloc(M,sizeof(Linha));
     Linha linha1 = inicia_linha(L1, qtd_campos_juncao);
     Linha linha2 = inicia_linha(L2, qtd_campos_juncao);
     size_t aux1 = 0, aux2 = 0;
@@ -28,7 +28,6 @@ void imprime_arquivo_juncao(char *caminho_arquivo_saida, char **L1, char **L2, i
     int fim_de_arquivo2 = getline(&linha_lida2, &aux2, arq2);
     add_campos(&linha1, linha_lida1);
     add_campos(&linha2, linha_lida2);
-    int tam_bloco = 0;
 
     while ((fim_de_arquivo1 != -1) && (fim_de_arquivo2 != -1))
     {
@@ -40,8 +39,9 @@ void imprime_arquivo_juncao(char *caminho_arquivo_saida, char **L1, char **L2, i
         {
             //caso as linhas sejam iguais(cmp==0) fazemos a mesclagem da linha(com k1+k2-l campos)
             //e armazenamos o resultado em um vetor de Linhas
-            vet_linhas[tam_bloco] = mescla_linha(linha1, linha2);
-            tam_bloco++;
+            Linha linha_mesclada = mescla_linha(linha1, linha2);
+            imprime_linha_arquivo(linha_mesclada,arquivo_saida);
+            destroi_linha(linha_mesclada);
             //destruímos os itens dentro das linhas utilizadas para mesclar
             //e avançamos nos dois arquivos, criando novas Linhas para serem comparadas
             destroi_linha(linha1);
@@ -73,31 +73,15 @@ void imprime_arquivo_juncao(char *caminho_arquivo_saida, char **L1, char **L2, i
         }
         //caso tenhamos um bloco de M linhas mescladas, devemos escrever no arquivo 
         //para liberar a memória principal
-        if (tam_bloco == M)
-        {
-            imprime_vet_linhas_arquivo(vet_linhas, arquivo_saida, M);
-            for (int i = 0; i < tam_bloco; i++)
-            {
-                destroi_linha(vet_linhas[i]);
-            }
-            tam_bloco = 0;
-        }
+      
 
     }
     //Se o resto da divisão de N/M for diferente de zero então ainda restam linhas 
     //a serem escritas no arquivo
-    if (tam_bloco > 0)
-    {
-        imprime_vet_linhas_arquivo(vet_linhas, arquivo_saida, tam_bloco);
-        for (int i = 0; i < tam_bloco; i++)
-        {
-            destroi_linha(vet_linhas[i]);
-        }
-    }
+   
     fclose(arquivo_saida);
     free(linha_lida1);
     free(linha_lida2);
-    free(vet_linhas);
     fclose(arq1);
     fclose(arq2);
     destroi_linha(linha1);
