@@ -41,7 +41,8 @@ Linha inicia_linha(char **campos_juncao, int qtd_campos)
 
 void add_campos(Linha *linha_ptr, char *string)
 {
-    char *token = strtok(string, ",");
+    char * del="\n\t\r,";
+    char *token = strtok(string, del);
     while (token != NULL)
     {
         if ((*linha_ptr).qtd_colunas >= (*linha_ptr).TAM_MAX_COLUNAS)
@@ -56,9 +57,9 @@ void add_campos(Linha *linha_ptr, char *string)
             linha_ptr->colunas = tmp;
         }
         
-        (*(linha_ptr)).colunas[(*linha_ptr).qtd_colunas] = strdup(trim(token));
+        (*(linha_ptr)).colunas[(*linha_ptr).qtd_colunas] = strdup(token);
         (*(linha_ptr)).qtd_colunas++;
-        token = strtok(NULL, ",");
+        token = strtok(NULL, del);
     }
 }
 

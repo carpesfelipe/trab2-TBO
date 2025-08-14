@@ -19,7 +19,8 @@ void imprime_arquivo_juncao(char *caminho_arquivo_saida, char **L1, char **L2, i
 
     char *linha_lida1 = NULL;
     char *linha_lida2 = NULL;
-    Linha vet_linhas[M];
+    //Linha vet_linhas[M];
+    Linha *vet_linhas=calloc(M,sizeof(Linha));
     Linha linha1 = inicia_linha(L1, qtd_campos_juncao);
     Linha linha2 = inicia_linha(L2, qtd_campos_juncao);
     size_t aux1 = 0, aux2 = 0;
@@ -96,6 +97,7 @@ void imprime_arquivo_juncao(char *caminho_arquivo_saida, char **L1, char **L2, i
     fclose(arquivo_saida);
     free(linha_lida1);
     free(linha_lida2);
+    free(vet_linhas);
     fclose(arq1);
     fclose(arq2);
     destroi_linha(linha1);
