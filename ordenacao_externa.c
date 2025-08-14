@@ -50,9 +50,10 @@ void destroi_campos_juncao(char **l, int tam)
 //cria os 2P dispositivos auxiliares para ordenacao externa
 void cria_arquivos_temporarios(FILE **temp_files, int P, char *arq)
 {
+    char nome[260];
     for (int i = 0; i < P * 2; i++)
     {
-        char nome[260];
+        // char nome[260];
 
         // Cria o nome do arquivo temporário identificando qual o arquivo e o índice
         sprintf(nome, "%s%d.txt", arq, i);
