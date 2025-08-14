@@ -8,11 +8,12 @@
 
 void limpa_arquivos_destino(FILE **temp_files, int indice_arquivo_destino, int P, char *arq)
 {
+    char nome[260];
+    FILE *file;
     for (int i = indice_arquivo_destino; i < indice_arquivo_destino + P; i++)
     {
-        char nome[260];
         sprintf(nome, "%s%d.txt", arq, i);
-        FILE *file = fopen(nome, "w");
+        file = fopen(nome, "w");
         if (file == NULL)
         {
             perror("Erro ao limpar arquivo de destino");
@@ -60,17 +61,25 @@ int troca_arquivos(int *indice_arquivo_fonte, int *indice_arquivo_destino, int P
 
 // essa funcao deve pegar a primeira linha de cada arquivo temporário de origem e inicializar o vetor de linhas
 void inicializa_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_rodada, int P, Linha *vetor_proximas_linhas, char **campos_juncao, int qtd_campos_juncao, int *linhas_lidas_bloco, int tamanho_atual_bloco, int qtd_iteracoes){
-    for (int i = 0; i < P; i++){
+    char *linha_lida = NULL; // Buffer para getline
+    size_t len = 0;
+    FILE *current_file;
+
+    ssize_t read;
+    int indice_linha = 0;
+
+    for (int i = 0; i < P; i++)
+    {
         // arquivos já foam abertos em ordenar_blocos
 
-        char *linha_lida = NULL; // Buffer para getline
-        size_t len = 0;          // Tamanho alocado por getline
+        linha_lida = NULL; // Buffer para getline
+        len = 0;          // Tamanho alocado por getline
 
         // zera o contador de linhas lidas para esse novo bloco
         linhas_lidas_bloco[i] = 0;
 
         // O vetor arquivos_fontes_abertos_nesta_rodada so diz respeito aos arquivos de leitura abertos nesta rodada (por isso podemos variar o i de 0 ate P sempre sem problemas)
-        FILE *current_file = arquivos_fontes_abertos_nesta_rodada[i];
+        current_file = arquivos_fontes_abertos_nesta_rodada[i];
 
         // Inicializa a linha no vetor de linhas
         vetor_proximas_linhas[i] = inicia_linha(campos_juncao, qtd_campos_juncao);
@@ -84,8 +93,7 @@ void inicializa_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_rodad
         }
 
         // Loop para encontrar a primeira linha que não seja "FIMBLOCO"
-        ssize_t read;
-        int indice_linha = 0;
+        indice_linha = 0;
         while ((read = getline(&linha_lida, &len, current_file)) != -1){
             if ((strcmp(linha_lida, "FIMBLOCO") != 0) && indice_linha == (qtd_iteracoes * (tamanho_atual_bloco + 1))){
                 // Se não é FIMBLOCO e estamos no bloco certo, é a primeira linha válida do bloco
@@ -102,10 +110,15 @@ void inicializa_vetor_proximas_linhas(FILE **arquivos_fontes_abertos_nesta_rodad
             vetor_proximas_linhas[i].qtd_colunas = 0;
         }
 
-        if (linha_lida != NULL){
-            free(linha_lida);
-            linha_lida = NULL;
-        }
+        // if (linha_lida != NULL){
+        //     free(linha_lida);
+        //     linha_lida = NULL;
+        // }
+    }
+    if (linha_lida != NULL)
+    {
+        free(linha_lida);
+        linha_lida = NULL;
     }
 }
 
@@ -161,10 +174,12 @@ Linha le_proxima_linha(FILE *arquivo_fonte, Linha *linha_anterior, char **campos
 
 void merge(Linha *vetor_proximas_linhas, int P, FILE **arquivo_fonte, FILE *arquivo_destino, char **campos_juncao, int qtd_campos_juncao, int tamanho_atual_bloco, int *linhas_lidas_bloco, int n_linhas_arquivo_entrada){
 
-    // o loop deve acontecer enquando houver linhas valias no vetor
-    while (1){
+    int indice_menor;
+        // o loop deve acontecer enquando houver linhas valias no vetor
+    while (1)
+    {
         // Variável para armazenar o índice do menor elemento (o -1 indica que ainda não foi encontrado nenhum elemento)
-        int indice_menor = -1;
+        indice_menor = -1;
 
         // Encontra o índice do menor elemento
         for (int i = 0; i < P; i++){
@@ -295,18 +310,24 @@ void ordena_blocos(FILE **temp_files, int P, int M, char *arquivo_in, char **L, 
 
     int indice_ultima_escrita = -1;
 
+    int indice_arquivo_destino_atual;
+    int num_blocos_ord_totais;
+
+    FILE *arquivos_fontes_para_esta_rodada[P];
+    FILE *arquivo_destino_para_esta_rodada;
+
     while (tamanho_bloco_ordenado_atual < n_linhas_arquivo_entrada) // Enquanto todos os dados não estiverem em um único bloco ordenado
     {
-        int indice_arquivo_destino_atual = inicio_arquivo_destino;                                                                // Inicia a distribuição no primeiro arquivo de destino (sera alterado pra cada bloco de merges feitos)
-        int num_blocos_ord_totais = (n_linhas_arquivo_entrada + tamanho_bloco_ordenado_atual - 1) / tamanho_bloco_ordenado_atual; // arredonda pra cima
+        indice_arquivo_destino_atual = inicio_arquivo_destino;                                                                // Inicia a distribuição no primeiro arquivo de destino (sera alterado pra cada bloco de merges feitos)
+        num_blocos_ord_totais = (n_linhas_arquivo_entrada + tamanho_bloco_ordenado_atual - 1) / tamanho_bloco_ordenado_atual; // arredonda pra cima
 
         // Itera sobre os grupos de P blocos ordenados para realizar o merge (faz merge dos primeiros/segundos/terceiros... grupos em cada arquivo)
         // o i varia de zero ate o indice do ultimo grupo do arquivo com mais grupos, o resultado deveser o num max de elementos em um arquivo
         for (int i = 0; i < ceil(num_blocos_ord_totais / (double)P); i++)
         {
 
-            FILE *arquivos_fontes_para_esta_rodada[P];
-            FILE *arquivo_destino_para_esta_rodada; // Variável local para o arquivo de destino
+            // FILE *arquivos_fontes_para_esta_rodada[P];
+            // FILE *arquivo_destino_para_esta_rodada; // Variável local para o arquivo de destino
 
             abre_arquivos_temporarios(arquivos_fontes_para_esta_rodada, P, inicio_arquivo_fonte, indice_arquivo_destino_atual, arq, &arquivo_destino_para_esta_rodada, nome);
 
